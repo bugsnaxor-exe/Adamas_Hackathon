@@ -99,3 +99,26 @@ exports.forgotPassword = catchAsync(async (req, res) => {
     // In production: Generate a reset token and send via NodeMailer
     res.json({ message: `Password reset link sent to ${email}` });
 });
+
+// UPDATE PROFILE
+exports.updateProfile = catchAsync(async (req, res) => {
+    const userId = req.user.id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: req.body },
+        {
+            new: true,
+            runValidators: true,
+        },
+    ).select("-password -otp -otpExpires"); // Security: Never return hashed passwords or OTPs in the response
+
+    if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+        message: "Profile updated successfully",
+        user: updatedUser,
+    });
+});
