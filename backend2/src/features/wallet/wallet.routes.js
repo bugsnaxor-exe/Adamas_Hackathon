@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const protect = require("../../middlewares/auth");
+const protect = require("../../middlewares/auth").protect;
 
 const {
     getWalletDetails,
@@ -14,6 +14,11 @@ const {
     payForTripSchema,
     historyQuerySchema,
 } = require("./transaction.validate");
+
+const {
+    validateRequest,
+    validateQuery,
+} = require("../../middlewares/validateRequest");
 
 router.use(protect);
 

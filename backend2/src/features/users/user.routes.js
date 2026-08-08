@@ -8,6 +8,7 @@ const {
     requestOtp,
     loginWithPhone,
     forgotPassword,
+    updateProfile,
 } = require("./user.controller");
 
 const { validateRequest } = require("../../middlewares/validateRequest");

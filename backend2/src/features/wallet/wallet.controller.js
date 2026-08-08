@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Transaction = require("./transaction.model");
 const User = require("../users/user.model");
 const Trip = require("../trips/trip.model");
-const catchAsync = require("../../utils/catchAsync");
+const catchAsync = require("../../middlewares/errorHandler");
 const paginate = require("../../utils/paginationHelper");
 
 // 1. GET WALLET BALANCE & RECENT TRANSACTIONS
