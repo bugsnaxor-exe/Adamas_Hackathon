@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../../middlewares/auth");
 
 const {
     addVehicle,
@@ -22,15 +23,20 @@ const {
 } = require("./vehicle.validation");
 
 // POST /api/vehicles -> Register a new vehicle
-router.post("/", validateRequest(createVehicleSchema), addVehicle);
+router.post("/", protect, validateRequest(createVehicleSchema), addVehicle);
 
-// GET /api/vehicles/user/:userId -> Get all vehicles owned by a user
-router.get("/user/:userId", validateParams(userIdParamSchema), getUserVehicles);
+// GET /api/vehicles/user -> Get all vehicles owned by a user
+router.get(
+    "/user",
+    protect,
+    validateParams(userIdParamSchema),
+    getUserVehicles,
+);
 
 // PUT /api/vehicles/:id -> Update a specific vehicle
-router.put("/:id", validateParams(idParamSchema), updateVehicle);
+router.put("/:id", protect, validateParams(idParamSchema), updateVehicle);
 
 // DELETE /api/vehicles/:id -> Remove a vehicle
-router.delete("/:id", validateParams(idParamSchema), deleteVehicle);
+router.delete("/:id", protect, validateParams(idParamSchema), deleteVehicle);
 
 module.exports = router;

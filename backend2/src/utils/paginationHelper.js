@@ -1,11 +1,11 @@
-const paginate = (model , pageNo = 1, pageSize = 10, filter = {}, populateOpts = '') => {
+const paginate = (model , pageNo = 1, pageSize = 10, filter = {}, populateOpts = '',sortOpts = { createdAt: -1 }) => {
     const page = parseInt(pageNo, 10) || 1;
     const limit = parseInt(pageSize, 10) || 10;
 
     const skip = (page - 1) * limitNum;
 
     const [data, totalCount] = await Promise.all([
-        model.find(filter).skip(skip).limit(limit).populate(populateOpts),
+        model.find(filter).populate(populateOpts).sort(sortOpts).skip(skip).limit(limit),
         model.countDocuments(filter)
     ]);
 
@@ -13,7 +13,7 @@ const paginate = (model , pageNo = 1, pageSize = 10, filter = {}, populateOpts =
 
     return {
         currentPage: page,
-        totalPages,
+        totalPages: Math.ceil(totalCount / limit),
         totalItems: totalCount,
         data: data
     };

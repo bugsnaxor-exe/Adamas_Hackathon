@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { protect } = require("../../middlewares/auth");
 
 const {
     bookTrip,
@@ -25,17 +26,18 @@ const {
 } = require("./trip.validation");
 
 // POST /api/travel/book -> Book a new trip
-router.post("/book", validateRequest(bookTripSchema), bookTrip);
+router.post("/book", protect, validateRequest(bookTripSchema), bookTrip);
 
 // GET /api/travel/user/:userId?role=passenger -> Get trip history for a user
-router.get("/my-trips", validateQuery(tripQuerySchema), getUserTrips);
+router.get("/my-trips", protect, validateQuery(tripQuerySchema), getUserTrips);
 
 // GET /api/travel/:id -> Get specific trip details
-router.get("/:id", validateParams(idParamSchema), getTripDetails);
+router.get("/:id", protect, validateParams(idParamSchema), getTripDetails);
 
 // PATCH /api/travel/:id/status -> Update ride status (Ongoing, Completed, Cancelled)
 router.patch(
     "/:id/status",
+    protect,
     validateParams(idParamSchema),
     validateRequest(updateStatusSchema),
     updateTripStatus,
@@ -44,6 +46,7 @@ router.patch(
 // PATCH /api/travel/:id/payment -> Update payment status (Pending, Completed, Failed)
 router.patch(
     "/:id/payment",
+    protect,
     validateParams(idParamSchema),
     validateRequest(updatePaymentSchema),
     updatePaymentStatus,
