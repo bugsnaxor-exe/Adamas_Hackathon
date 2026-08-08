@@ -17,7 +17,7 @@ const otpStore = {}; // Stores OTPs temporarily: { "phone_number": "otp_code" }
 
 // User Registration
 app.post('/api/auth/register', async (req, res) => {
-  const { name, email, phone, role, password } = req.body;
+  const { name, email, phone, password } = req.body;
 
   try {
     // Check if user already exists
@@ -36,18 +36,17 @@ app.post('/api/auth/register', async (req, res) => {
       name,
       email,
       phone,
-      role,
       password: hashedPassword,
     };
     users.push(newUser);
 
     // Generate a JWT Token
-    const token = jwt.sign({ userId: newUser.id, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: newUser.id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({
       message: 'Account created successfully',
       token,
-      user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role }
+      user: { id: newUser.id, name: newUser.name, email: newUser.email}
     });
   } catch (error) {
     res.status(500).json({ error: 'Server error during registration' });
@@ -72,12 +71,12 @@ app.post('/api/auth/login/email', async (req, res) => {
     }
 
     // Generate Token
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: { id: user.id, name: user.name, email: user.email }
     });
   } catch (error) {
     res.status(500).json({ error: 'Server error during login' });
@@ -123,12 +122,12 @@ app.post('/api/auth/login/phone', (req, res) => {
     delete otpStore[phone];
 
     // Generate Token
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
       message: 'Phone login successful',
       token,
-      user: { id: user.id, name: user.name, phone: user.phone, role: user.role }
+      user: { id: user.id, name: user.name, phone: user.phone }
     });
   } catch (error) {
     res.status(500).json({ error: 'Server error during phone login' });
