@@ -1,4 +1,4 @@
-const Vehicle = require('./vehicle.model'); // Adjust path if needed
+const Vehicle = require('./vehicle.model'); 
 
 // 1. ADD A NEW VEHICLE
 exports.addVehicle = async (req, res) => {

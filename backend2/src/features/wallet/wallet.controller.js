@@ -14,7 +14,7 @@ exports.getWalletDetails = async (req, res) => {
 
     const transactions = await Transaction.find({ userId })
       .sort({ createdAt: -1 })
-      .limit(10); // Get the 10 most recent transactions
+      .limit(10); 
 
     res.status(200).json({
       balance: user.walletBalance,
@@ -25,7 +25,7 @@ exports.getWalletDetails = async (req, res) => {
   }
 };
 
-// 2. RECHARGE WALLET (Add Funds)
+// 2. RECHARGE WALLET
 exports.rechargeWallet = async (req, res) => {
   try {
     const { userId, amount, paymentMethod } = req.body;
