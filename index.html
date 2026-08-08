@@ -1,750 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CommutePool - Smart Carpooling Login & Sign Up</title>
-  <meta name="description"
-    content="Sign in or create an account to start sharing rides and reducing your daily commute costs." />
+  <title>CommutePlus - Enterprise Mobility</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --bg-card: rgba(30, 41, 59, 0.75);
-      --border-card: rgba(255, 255, 255, 0.12);
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --primary-glow: rgba(59, 130, 246, 0.35);
-      --accent: #10b981;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --input-bg: rgba(15, 23, 42, 0.6);
-      --input-border: rgba(255, 255, 255, 0.15);
-      --input-focus: #60a5fa;
-      --radius: 16px;
-      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --bg-app: #f4f6fa;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-input: #f8fafc;
+      --border-color: #e2e8f0;
+      --border-light: #edf2f7;
+      --text-dark: #0f172a;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --primary-indigo: #4f46e5;
+      --primary-indigo-hover: #4338ca;
+      --primary-indigo-light: #eeebfe;
+      --primary-indigo-badge: #e0e7ff;
+      --accent-green-bg: #d1fae5;
+      --accent-green-text: #059669;
+      --accent-red-bg: #ffe4e6;
+      --accent-red-text: #e11d48;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+      --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.03);
+      --shadow-dropdown: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --transition: all 0.2s ease-in-out;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: #d1d5db;
       color: var(--text-main);
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow-x: hidden;
-      position: relative;
-      padding: 24px;
+      display: flex; justify-content: center; align-items: center;
+      padding: 0; overflow-x: hidden;
     }
 
-    .background-globes {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
+    .app-viewport-frame {
+      width: 100%; max-width: 1280px; height: 860px; background: var(--bg-app);
+      border-radius: 24px; border: 12px solid #374151; display: grid;
+      grid-template-columns: 240px 1fr; overflow: hidden; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3); position: relative;
     }
 
-    .globe {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.45;
-      animation: floatGlobe 12s infinite alternate ease-in-out;
+    @media (max-width: 1024px) {
+      .app-viewport-frame { max-width: 100vw; height: 100vh; border-radius: 0; border: none; grid-template-columns: 1fr; }
     }
 
-    .globe-1 {
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
-      top: -100px;
-      left: -100px;
+    .cp-sidebar {
+      background: var(--bg-sidebar); border-right: 1px solid var(--border-color);
+      padding: 24px 16px; display: flex; flex-direction: column; justify-content: space-between; z-index: 20;
     }
+    @media (max-width: 800px) { .cp-sidebar { display: none !important; } }
 
-    .globe-2 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #10b981 0%, #047857 100%);
-      bottom: -150px;
-      right: -150px;
-      animation-delay: -6s;
+    .brand-section { padding: 0 8px; margin-bottom: 32px; }
+    .brand-name { font-size: 1.15rem; font-weight: 800; color: var(--primary-indigo); display: flex; align-items: center; gap: 8px; }
+    .brand-subtitle { font-size: 0.68rem; font-weight: 800; color: var(--text-light); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 2px; }
+
+    .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; transition: var(--transition); position: relative;
     }
+    .nav-item:hover { background: var(--bg-app); color: var(--text-dark); }
+    .nav-item.active { background: var(--primary-indigo-light); color: var(--primary-indigo); font-weight: 700; }
+    .nav-item.active::after { content: ''; position: absolute; right: 0; top: 6px; bottom: 6px; width: 4px; background: var(--primary-indigo); border-radius: 4px 0 0 4px; }
 
-    @keyframes floatGlobe {
-      0% {
-        transform: translate(0, 0) scale(1);
-      }
-
-      100% {
-        transform: translate(60px, 40px) scale(1.1);
-      }
+    .sidebar-bottom { display: flex; flex-direction: column; gap: 16px; }
+    .btn-sidebar-cta {
+      width: 100%; background: var(--primary-indigo); color: #ffffff; border: none;
+      padding: 12px; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
     }
+    .btn-sidebar-cta:hover { background: var(--primary-indigo-hover); }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 480px;
-    }
+    .user-sidebar-profile { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+    .user-avatar-sm { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .user-info-text { flex: 1; overflow: hidden; }
+    .user-name-title { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
+    .user-dept-subtitle { font-size: 0.72rem; color: var(--text-light); }
 
-    .brand-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
+    .cp-main-workspace { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; background: var(--bg-app); }
 
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }
+    .cp-header { height: 64px; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-app); z-index: 10; }
+    .header-search-bar { width: 340px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-pill); padding: 8px 16px; display: flex; align-items: center; gap: 10px; }
+    .header-search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.85rem; }
 
-    .logo svg {
-      color: var(--primary);
-      filter: drop-shadow(0 0 10px var(--primary-glow));
-    }
+    .header-actions-right { display: flex; align-items: center; gap: 16px; }
+    .icon-btn-circle { width: 36px; height: 36px; border-radius: 50%; background: #ffffff; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; }
+    .notification-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-red-text); }
 
-    .logo strong {
-      color: var(--primary);
-    }
+    .cp-content-scroll { flex: 1; padding: 0 32px 32px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
 
-    .tagline {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-top: 6px;
-    }
+    .dash-welcome-row { display: flex; justify-content: space-between; align-items: flex-end; }
+    .dash-title { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); }
+    .dash-sub { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
 
-    .auth-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius);
-      padding: 32px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.1);
-    }
+    .dash-metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .metric-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; }
+    .metric-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .metric-icon-box { width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: var(--primary-indigo); font-size: 1.1rem; }
+    .trend-badge { background: var(--accent-green-bg); color: var(--accent-green-text); font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 4px; }
+    .metric-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+    .metric-val { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-top: 4px; }
 
-    .auth-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      background: rgba(15, 23, 42, 0.5);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
+    .dash-middle-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
+    .cp-card-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-card); }
+    .card-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-box-title { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); }
+    .link-view-all { font-size: 0.82rem; font-weight: 700; color: var(--primary-indigo); cursor: pointer; }
 
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 10px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
+    .timeline-item { display: flex; gap: 16px; padding: 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-light); margin-bottom: 12px; }
+    .timeline-dots { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 0; }
+    .dot-blue { width: 8px; height: 8px; border-radius: 50%; background: var(--primary-indigo); }
+    .dot-line { width: 2px; flex: 1; background: #cbd5e1; margin: 4px 0; }
+    .dot-green { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--accent-green-text); background: #ffffff; }
+    .timeline-details { flex: 1; }
+    .timeline-row { display: flex; justify-content: space-between; align-items: center; }
+    .timeline-time { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+    .timeline-place { font-size: 0.92rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .status-badge-purple { background: var(--primary-indigo-badge); color: var(--primary-indigo); font-size: 0.72rem; font-weight: 800; padding: 2px 10px; border-radius: var(--radius-pill); }
 
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
+    .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .quick-act-btn { background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: var(--transition); }
+    .quick-act-btn:hover { background: #ffffff; border-color: var(--primary-indigo); transform: translateY(-2px); }
+    .act-icon { font-size: 1.4rem; color: var(--primary-indigo); }
+    .act-label { font-size: 0.82rem; font-weight: 700; color: var(--text-dark); }
 
-    .sub-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
+    .find-ride-layout { display: grid; grid-template-columns: 440px 1fr; gap: 24px; height: 100%; }
+    .find-search-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-card); }
+    .cp-input-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-dark); }
+    .cp-input-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.9rem; }
 
-    .sub-tab-btn {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-muted);
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
+    .driver-rec-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; }
+    .driver-head-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    .driver-photo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+    .driver-title-name { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
+    .driver-title-sub { font-size: 0.78rem; color: var(--text-muted); }
+    .driver-price-right { margin-left: auto; text-align: right; }
+    .driver-price-amount { font-size: 1.1rem; font-weight: 800; color: var(--primary-indigo); }
+    .driver-price-time { font-size: 0.75rem; color: var(--text-light); }
 
-    .sub-tab-btn.active {
-      border-color: var(--primary);
-      color: var(--text-main);
-      background: rgba(59, 130, 246, 0.15);
-    }
+    .map-canvas-container { background: #e5e7eb; border-radius: var(--radius-lg); border: 1px solid var(--border-color); position: relative; overflow: hidden; min-height: 500px; }
+    .map-control-widgets { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+    .map-control-btn { width: 36px; height: 36px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .map-bottom-selected-overlay { position: absolute; bottom: 20px; right: 20px; left: 20px; background: #ffffff; border-radius: var(--radius-lg); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-dropdown); border: 1px solid var(--border-color); }
+    .btn-sos-danger { position: absolute; bottom: 20px; right: 20px; background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; padding: 10px 20px; border-radius: var(--radius-pill); font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
+    .analytics-grid-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .analytics-chart-split { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media (max-width: 480px) {
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .label-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .forgot-link,
-    .otp-link,
-    .terms-link {
-      color: var(--primary);
-      font-size: 0.8rem;
-      text-decoration: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: var(--transition);
-    }
-
-    .forgot-link:hover,
-    .otp-link:hover,
-    .terms-link:hover {
-      text-decoration: underline;
-      color: var(--input-focus);
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="tel"],
-    select {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 0.92rem;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    input::placeholder {
-      color: rgba(148, 163, 184, 0.6);
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--input-focus);
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
-    }
-
-    .toggle-pass {
-      position: absolute;
-      right: 12px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-      opacity: 0.7;
-    }
-
-    .toggle-pass:hover {
-      opacity: 1;
-    }
-
-    .phone-wrapper {
-      gap: 8px;
-    }
-
-    .phone-wrapper select {
-      width: 110px;
-      cursor: pointer;
-    }
-
-    .role-selector {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .role-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      padding: 12px;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-    }
-
-    .role-card input[type="radio"] {
-      display: none;
-    }
-
-    .role-card.active {
-      border-color: var(--accent);
-      background: rgba(16, 185, 129, 0.12);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
-    }
-
-    .role-icon {
-      font-size: 1.4rem;
-      margin-bottom: 4px;
-    }
-
-    .role-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .role-desc {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .form-options {
-      margin-bottom: 20px;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--primary);
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      width: 100%;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      padding: 13px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-
-    .toast {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      margin-bottom: 16px;
-      text-align: center;
-      transition: var(--transition);
-    }
-
-    .toast.success {
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid var(--accent);
-      color: #a7f3d0;
-    }
-
-    .toast.info {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid var(--primary);
-      color: #bfdbfe;
-    }
-
-    .auth-footer {
-      margin-top: 24px;
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding-top: 18px;
-    }
-
-    .auth-footer a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .auth-footer a:hover {
-      text-decoration: underline;
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    .btn-primary-indigo { background: var(--primary-indigo); color: #ffffff; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: var(--transition); }
+    .btn-primary-indigo:hover { background: var(--primary-indigo-hover); }
+    .btn-outline { background: #ffffff; border: 1px solid var(--border-color); color: var(--text-dark); padding: 8px 16px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+    .hidden { display: none !important; }
   </style>
 </head>
-
 <body>
-  <div class="background-globes">
-    <div class="globe globe-1"></div>
-    <div class="globe globe-2"></div>
-  </div>
-
-  <div class="container">
-    <header class="brand-header">
-      <div class="logo">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path
-            d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-          <circle cx="7" cy="17" r="2" />
-          <path d="M9 17h6" />
-          <circle cx="17" cy="17" r="2" />
-        </svg>
-        <span>Commute<strong>Pool</strong></span>
-      </div>
-      <p class="tagline">Share your ride, save costs & reduce carbon footprint.</p>
-    </header>
-
-    <main class="auth-card">
-      <nav class="auth-tabs" role="tablist">
-        <button id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">
-          Sign In
-        </button>
-        <button id="tab-register" class="tab-btn" onclick="switchAuthTab('register')">
-          Create Account
-        </button>
-      </nav>
-
-      <div id="toast" class="toast hidden"></div>
-
-      <!-- PANEL 1: SIGN IN -->
-      <section id="panel-login" class="auth-panel">
-        <div class="sub-tabs">
-          <button id="login-type-email" class="sub-tab-btn active" onclick="switchLoginMethod('email')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
-            </svg>
-            Email
-          </button>
-          <button id="login-type-phone" class="sub-tab-btn" onclick="switchLoginMethod('phone')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-            </svg>
-            Phone Number
-          </button>
+  <div class="app-viewport-frame">
+    <!-- LEFT SIDEBAR -->
+    <aside class="cp-sidebar">
+      <div>
+        <div class="brand-section">
+          <div class="brand-name">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+            <span>CommutePlus</span>
+          </div>
+          <div class="brand-subtitle">ENTERPRISE MOBILITY</div>
         </div>
 
-        <!-- Email Form -->
-        <form id="form-email-login" onsubmit="handleLoginSubmit(event, 'email')">
-          <div class="form-group">
-            <label for="login-email">Email Address</label>
-            <div class="input-wrapper">
-              <input type="email" id="login-email" placeholder="name@example.com" required />
+        <ul class="nav-menu">
+          <li id="nav-dash" class="nav-item active" onclick="showTab('dash')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </li>
+          <li id="nav-find" class="nav-item" onclick="showTab('find')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Find Ride</span>
+          </li>
+          <li id="nav-offer" class="nav-item" onclick="showTab('offer')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+            <span>Offer Ride</span>
+          </li>
+          <li id="nav-trips" class="nav-item" onclick="showTab('trips')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>My Trips</span>
+          </li>
+          <li id="nav-wallet" class="nav-item" onclick="showTab('wallet')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span>Wallet</span>
+          </li>
+          <li id="nav-reports" class="nav-item" onclick="showTab('reports')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Reports</span>
+          </li>
+          <li id="nav-vehicles" class="nav-item" onclick="showTab('vehicles')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17l-1 3m15-3l1 3"/></svg>
+            <span>Vehicles</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="btn-sidebar-cta" onclick="showTab('find')">
+          <span>+</span> <span>Book New Trip</span>
+        </button>
+        <div class="user-sidebar-profile">
+          <img class="user-avatar-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" />
+          <div class="user-info-text">
+            <div class="user-name-title">Alex Rivera</div>
+            <div class="user-dept-subtitle">Engineering Dept</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE AREA -->
+    <div class="cp-main-workspace">
+      <header class="cp-header">
+        <div class="header-search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search routes, colleagues..." />
+        </div>
+        <div class="header-actions-right">
+          <div class="icon-btn-circle"><span class="notification-dot"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div class="icon-btn-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+          <img class="user-avatar-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" />
+        </div>
+      </header>
+
+      <div class="cp-content-scroll">
+        <!-- TAB 1: DASHBOARD -->
+        <div id="tab-dash-view">
+          <div class="dash-welcome-row" style="margin-bottom: 24px;">
+            <div>
+              <h1 class="dash-title">Good morning, Alex.</h1>
+              <p class="dash-sub">Here is your commute overview for this week.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-outline">⚡ Filter</button>
+              <button class="btn-primary-indigo" onclick="showTab('find')">+ New Route</button>
             </div>
           </div>
 
-          <div class="form-group">
-            <div class="label-row">
-              <label for="login-email-pass">Password</label>
-              <button type="button" class="forgot-link" onclick="handleForgotPassword(event)">Forgot?</button>
-            </div>
-            <div class="input-wrapper">
-              <input type="password" id="login-email-pass" placeholder="••••••••" required />
-              <button type="button" class="toggle-pass" onclick="togglePass('login-email-pass', this)"
-                aria-label="Toggle password">👁️</button>
-            </div>
+          <div class="dash-metrics-grid" style="margin-bottom: 24px;">
+            <div class="metric-card"><div class="metric-card-top"><div class="metric-icon-box">🚗</div><span class="trend-badge">↗ 12%</span></div><div><div class="metric-label">Total Trips (Month)</div><div class="metric-val">24</div></div></div>
+            <div class="metric-card"><div class="metric-card-top"><div class="metric-icon-box" style="color: #10b981;">🌱</div><span class="trend-badge">↗ 8%</span></div><div><div class="metric-label">CO2 Saved (kg)</div><div class="metric-val">142.5</div></div></div>
+            <div class="metric-card"><div class="metric-card-top"><div class="metric-icon-box" style="color: #3b82f6;">🐷</div></div><div><div class="metric-label">Monthly Savings</div><div class="metric-val">$128.00</div></div></div>
           </div>
 
-          <div class="form-options">
-            <label class="checkbox-label">
-              <input type="checkbox" id="remember-me" checked />
-              <span>Remember me</span>
-            </label>
-          </div>
-
-          <button type="submit" class="btn-primary">Sign In</button>
-        </form>
-
-        <!-- Phone Form -->
-        <form id="form-phone-login" class="hidden" onsubmit="handleLoginSubmit(event, 'phone')">
-          <div class="form-group">
-            <label for="login-phone">Phone Number</label>
-            <div class="input-wrapper phone-wrapper">
-              <select id="login-country-code">
-                <option value="+1">+1 (US/CA)</option>
-                <option value="+91" selected>+91 (IN)</option>
-                <option value="+44">+44 (UK)</option>
-                <option value="+61">+61 (AU)</option>
-              </select>
-              <input type="tel" id="login-phone" placeholder="98765 43210" pattern="[0-9]{8,12}" required />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="label-row">
-              <label for="login-phone-otp">OTP / Passcode</label>
-              <button type="button" class="otp-link" onclick="requestOTP(event)">Get OTP</button>
-            </div>
-            <div class="input-wrapper">
-              <input type="password" id="login-phone-otp" placeholder="6-digit code" pattern="[0-9]{6}" required />
-            </div>
-          </div>
-
-          <button type="submit" class="btn-primary">Sign In with Phone</button>
-        </form>
-      </section>
-
-      <!-- PANEL 2: CREATE ACCOUNT -->
-      <section id="panel-register" class="auth-panel hidden">
-        <form id="form-register" onsubmit="handleRegisterSubmit(event)">
-          <div class="form-group">
-            <label for="reg-name">Full Name</label>
-            <div class="input-wrapper">
-              <input type="text" id="reg-name" placeholder="Alex Morgan" required />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="reg-email">Email Address</label>
-              <div class="input-wrapper">
-                <input type="email" id="reg-email" placeholder="name@example.com" required />
+          <div class="dash-middle-grid">
+            <div class="cp-card-box">
+              <div class="card-box-header"><div class="card-box-title">Upcoming Trips</div><span class="link-view-all" onclick="showTab('trips')">View All</span></div>
+              <div class="timeline-item">
+                <div class="timeline-dots"><div class="dot-blue"></div><div class="dot-line"></div><div class="dot-green"></div></div>
+                <div class="timeline-details">
+                  <div class="timeline-row" style="margin-bottom: 4px;"><span class="timeline-time">08:00 AM • Home</span><span style="font-size:0.78rem; color:#64748b;">Driven by Mark T.</span></div>
+                  <div class="timeline-place">123 Willow Creek Dr.</div>
+                  <div class="timeline-row"><span class="timeline-time">08:45 AM • HQ</span><span class="status-badge-purple">BOOKED</span></div>
+                  <div class="timeline-place" style="margin-bottom:0;">Tech Campus, Bldg B</div>
+                </div>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="reg-phone">Phone Number</label>
-              <div class="input-wrapper">
-                <input type="tel" id="reg-phone" placeholder="9876543210" pattern="[0-9]{8,12}" required />
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div class="cp-card-box">
+                <div class="card-box-title" style="margin-bottom: 14px;">Quick Actions</div>
+                <div class="quick-actions-grid">
+                  <div class="quick-act-btn" onclick="showTab('find')"><span class="act-icon">🔍</span><span class="act-label">Find Ride</span></div>
+                  <div class="quick-act-btn" onclick="showTab('offer')"><span class="act-icon">🚗</span><span class="act-label">Offer Ride</span></div>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="reg-pass">Password</label>
-              <div class="input-wrapper">
-                <input type="password" id="reg-pass" placeholder="Min. 8 chars" minlength="8" required />
-                <button type="button" class="toggle-pass" onclick="togglePass('reg-pass', this)"
-                  aria-label="Toggle password">👁️</button>
-              </div>
+        <!-- TAB 2: FIND RIDE -->
+        <div id="tab-find-view" class="hidden">
+          <div class="find-ride-layout">
+            <div class="find-search-card">
+              <h3 style="font-size: 1.1rem; font-weight: 800;">Find a Ride</h3>
+              <div class="cp-input-box"><span>📍</span><input type="text" value="Downtown HQ" /></div>
+              <div class="cp-input-box"><span>🏁</span><input type="text" value="Tech Park North, Bldg C" /></div>
+              <button class="btn-primary-indigo" style="width: 100%; padding: 12px;" onclick="alert('Searching Rides...')">🔍 Search Rides</button>
             </div>
 
-            <div class="form-group">
-              <label for="reg-confirm-pass">Confirm Password</label>
-              <div class="input-wrapper">
-                <input type="password" id="reg-confirm-pass" placeholder="Re-enter password" minlength="8" required />
-                <button type="button" class="toggle-pass" onclick="togglePass('reg-confirm-pass', this)"
-                  aria-label="Toggle confirm password">👁️</button>
-              </div>
+            <div class="map-canvas-container">
+              <svg width="100%" height="100%" viewBox="0 0 800 600" style="background: #e5e7eb;">
+                <line x1="100" y1="0" x2="100" y2="600" stroke="#d1d5db" stroke-width="2" />
+                <line x1="500" y1="0" x2="500" y2="600" stroke="#d1d5db" stroke-width="2" />
+                <polyline points="150,450 350,380 650,150" fill="none" stroke="#4f46e5" stroke-width="6" />
+                <circle cx="150" cy="450" r="10" fill="#4f46e5" />
+                <circle cx="650" cy="150" r="10" fill="#10b981" />
+              </svg>
             </div>
           </div>
+        </div>
 
-          <div class="form-options">
-            <label class="checkbox-label">
-              <input type="checkbox" id="agree-terms" required />
-              <span>I agree to the <a href="#" class="terms-link">Terms of Service</a> & <a href="#"
-                  class="terms-link">Privacy Policy</a></span>
-            </label>
+        <!-- TAB 3: MY TRIPS / MAP -->
+        <div id="tab-trips-view" class="hidden" style="height: 100%;">
+          <div class="map-canvas-container" style="height: 100%; min-height: 600px;">
+            <svg width="100%" height="100%" viewBox="0 0 900 650" style="background: #93c5fd;">
+              <rect x="150" y="50" width="600" height="550" rx="16" fill="#e5e7eb" />
+              <path d="M 250,450 Q 500,550 700,200" fill="none" stroke="#818cf8" stroke-width="6" stroke-dasharray="8 6" />
+              <circle cx="520" cy="280" r="22" fill="#4f46e5" />
+            </svg>
+            <button class="btn-sos-danger"><span>📍</span> <span>Safety / SOS</span></button>
           </div>
+        </div>
 
-          <button type="submit" class="btn-primary">Create Account</button>
-        </form>
-      </section>
-
-      <footer class="auth-footer">
-        <p id="footer-login-prompt">
-          Don't have an account? <a href="#" onclick="switchAuthTab('register'); return false;">Create one now</a>
-        </p>
-        <p id="footer-register-prompt" class="hidden">
-          Already registered? <a href="#" onclick="switchAuthTab('login'); return false;">Sign in here</a>
-        </p>
-      </footer>
-    </main>
+        <!-- TAB 4: REPORTS -->
+        <div id="tab-reports-view" class="hidden">
+          <h1 class="dash-title" style="margin-bottom: 24px;">Analytics Overview</h1>
+          <div class="analytics-grid-4col">
+            <div class="metric-card"><div class="metric-label">Fuel Efficiency</div><div class="metric-val">4.2 L/100km</div></div>
+            <div class="metric-card"><div class="metric-label">Cost per KM</div><div class="metric-val">$0.18</div></div>
+            <div class="metric-card"><div class="metric-label">Org Participation</div><div class="metric-val">64%</div></div>
+            <div class="metric-card"><div class="metric-label">Emissions Saved</div><div class="metric-val">1,240 kg</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    function switchAuthTab(tab) {
-      const loginTabBtn = document.getElementById('tab-login');
-      const registerTabBtn = document.getElementById('tab-register');
-      const loginPanel = document.getElementById('panel-login');
-      const registerPanel = document.getElementById('panel-register');
-      const footerLogin = document.getElementById('footer-login-prompt');
-      const footerRegister = document.getElementById('footer-register-prompt');
-
-      hideToast();
-
-      if (tab === 'login') {
-        loginTabBtn.classList.add('active');
-        registerTabBtn.classList.remove('active');
-        loginPanel.classList.remove('hidden');
-        registerPanel.classList.add('hidden');
-        footerLogin.classList.remove('hidden');
-        footerRegister.classList.add('hidden');
-      } else {
-        registerTabBtn.classList.add('active');
-        loginTabBtn.classList.remove('active');
-        registerPanel.classList.remove('hidden');
-        loginPanel.classList.add('hidden');
-        footerRegister.classList.remove('hidden');
-        footerLogin.classList.add('hidden');
-      }
-    }
-
-    function switchLoginMethod(method) {
-      const emailBtn = document.getElementById('login-type-email');
-      const phoneBtn = document.getElementById('login-type-phone');
-      const emailForm = document.getElementById('form-email-login');
-      const phoneForm = document.getElementById('form-phone-login');
-
-      hideToast();
-
-      if (method === 'email') {
-        emailBtn.classList.add('active');
-        phoneBtn.classList.remove('active');
-        emailForm.classList.remove('hidden');
-        phoneForm.classList.add('hidden');
-      } else {
-        phoneBtn.classList.add('active');
-        emailBtn.classList.remove('active');
-        phoneForm.classList.remove('hidden');
-        emailForm.classList.add('hidden');
-      }
-    }
-
-    function togglePass(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '🙈';
-      } else {
-        input.type = 'password';
-        btn.textContent = '👁️';
-      }
-    }
-
-    function updateRoleSelection(radio) {
-      const cards = document.querySelectorAll('.role-card');
-      cards.forEach(card => card.classList.remove('active'));
-      radio.closest('.role-card').classList.add('active');
-    }
-
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = `toast ${type}`;
-      toast.classList.remove('hidden');
-    }
-
-    function hideToast() {
-      const toast = document.getElementById('toast');
-      toast.classList.add('hidden');
-    }
-
-    function requestOTP(event) {
-      event.preventDefault();
-      const phoneInput = document.getElementById('login-phone');
-      const code = document.getElementById('login-country-code').value;
-      if (!phoneInput.value) {
-        showToast('Please enter a valid phone number first.', 'info');
-        phoneInput.focus();
-        return;
-      }
-      showToast(`OTP sent to ${code} ${phoneInput.value}. (Mock OTP: 123456)`, 'success');
-    }
-
-    function handleForgotPassword(event) {
-      event.preventDefault();
-      const email = document.getElementById('login-email').value;
-      if (email) {
-        showToast(`Password reset link sent to ${email}`, 'success');
-      } else {
-        showToast('Please enter your email address to reset password.', 'info');
-        document.getElementById('login-email').focus();
-      }
-    }
-
-    function handleLoginSubmit(event, method) {
-      event.preventDefault();
-      if (method === 'email') {
-        const email = document.getElementById('login-email').value;
-        showToast(`Welcome back! Logged in as ${email}`, 'success');
-      } else {
-        const code = document.getElementById('login-country-code').value;
-        const phone = document.getElementById('login-phone').value;
-        showToast(`Verified! Logged in with ${code} ${phone}`, 'success');
-      }
-    }
-
-    function handleRegisterSubmit(event) {
-      event.preventDefault();
-      const pass = document.getElementById('reg-pass').value;
-      const confirmPass = document.getElementById('reg-confirm-pass').value;
-
-      if (pass !== confirmPass) {
-        showToast('Passwords do not match. Please try again.', 'info');
-        return;
-      }
-
-      const name = document.getElementById('reg-name').value;
-      const role = document.querySelector('input[name="user-role"]:checked').value;
-      const roleLabel = role === 'driver' ? 'Driver' : 'Passenger';
-
-      showToast(`Account created for ${name} (${roleLabel})! Redirecting...`, 'success');
+    function showTab(t) {
+      ['dash', 'find', 'trips', 'reports'].forEach(tab => {
+        const view = document.getElementById('tab-' + tab + '-view');
+        const nav = document.getElementById('nav-' + tab);
+        if (view) view.classList.add('hidden');
+        if (nav) nav.classList.remove('active');
+      });
+      const activeView = document.getElementById('tab-' + t + '-view');
+      const activeNav = document.getElementById('nav-' + t);
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeNav) activeNav.classList.add('active');
     }
   </script>
 </body>
-
 </html>
