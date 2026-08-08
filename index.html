@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CommutePool - Smart Carpooling Login & Sign Up</title>
+  <meta name="description" content="Sign in or create an account to start sharing rides and reducing your daily commute costs." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="background-globes">
+    <div class="globe globe-1"></div>
+    <div class="globe globe-2"></div>
+  </div>
+
+  <div class="container">
+    <header class="brand-header">
+      <div class="logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+          <circle cx="7" cy="17" r="2"/>
+          <path d="M9 17h6"/>
+          <circle cx="17" cy="17" r="2"/>
+        </svg>
+        <span>Commute<strong>Pool</strong></span>
+      </div>
+      <p class="tagline">Share your ride, save costs & reduce carbon footprint.</p>
+    </header>
+
+    <main class="auth-card">
+      <!-- Main Auth Tabs: Sign In / Create Account -->
+      <nav class="auth-tabs" role="tablist">
+        <button id="tab-login" class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-login" onclick="switchAuthTab('login')">
+          Sign In
+        </button>
+        <button id="tab-register" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-register" onclick="switchAuthTab('register')">
+          Create Account
+        </button>
+      </nav>
+
+      <!-- Toast Notification Container -->
+      <div id="toast" class="toast hidden"></div>
+
+      <!-- PANEL 1: LOGIN -->
+      <section id="panel-login" class="auth-panel active" role="tabpanel" aria-labelledby="tab-login">
+        <!-- Sub-tabs: Email / Phone Number -->
+        <div class="sub-tabs">
+          <button id="login-type-email" class="sub-tab-btn active" onclick="switchLoginMethod('email')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email
+          </button>
+          <button id="login-type-phone" class="sub-tab-btn" onclick="switchLoginMethod('phone')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Phone Number
+          </button>
+        </div>
+
+        <!-- Email Login Form -->
+        <form id="form-email-login" onsubmit="handleLoginSubmit(event, 'email')">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <div class="input-wrapper">
+              <input type="email" id="login-email" placeholder="name@example.com" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="login-email-pass">Password</label>
+              <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot?</a>
+            </div>
+            <div class="input-wrapper">
+              <input type="password" id="login-email-pass" placeholder="••••••••" required />
+              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('login-email-pass', this)" aria-label="Toggle password visibility">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-me" checked />
+              <span>Remember me</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">Sign In</button>
+        </form>
+
+        <!-- Phone Login Form -->
+        <form id="form-phone-login" class="hidden" onsubmit="handleLoginSubmit(event, 'phone')">
+          <div class="form-group">
+            <label for="login-phone">Phone Number</label>
+            <div class="input-wrapper phone-wrapper">
+              <select id="login-country-code" aria-label="Country Code">
+                <option value="+1">+1 (US/CA)</option>
+                <option value="+91" selected>+91 (IN)</option>
+                <option value="+44">+44 (UK)</option>
+                <option value="+61">+61 (AU)</option>
+              </select>
+              <input type="tel" id="login-phone" placeholder="98765 43210" pattern="[0-9]{8,12}" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="login-phone-otp">OTP / Passcode</label>
+              <button type="button" class="otp-link" onclick="requestOTP(event)">Get OTP</button>
+            </div>
+            <div class="input-wrapper">
+              <input type="password" id="login-phone-otp" placeholder="6-digit code" pattern="[0-9]{6}" required />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Sign In with Phone</button>
+        </form>
+      </section>
+
+      <!-- PANEL 2: CREATE ACCOUNT -->
+      <section id="panel-register" class="auth-panel hidden" role="tabpanel" aria-labelledby="tab-register">
+        <form id="form-register" onsubmit="handleRegisterSubmit(event)">
+          <div class="form-group">
+            <label for="reg-name">Full Name</label>
+            <div class="input-wrapper">
+              <input type="text" id="reg-name" placeholder="Alex Morgan" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-email">Email Address</label>
+              <div class="input-wrapper">
+                <input type="email" id="reg-email" placeholder="name@example.com" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-phone">Phone Number</label>
+              <div class="input-wrapper">
+                <input type="tel" id="reg-phone" placeholder="9876543210" pattern="[0-9]{8,12}" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>I want to:</label>
+            <div class="role-selector">
+              <label class="role-card active">
+                <input type="radio" name="user-role" value="rider" checked onclick="updateRoleSelection(this)" />
+                <span class="role-icon">🚗</span>
+                <span class="role-title">Find Rides</span>
+                <span class="role-desc">Passenger</span>
+              </label>
+
+              <label class="role-card">
+                <input type="radio" name="user-role" value="driver" onclick="updateRoleSelection(this)" />
+                <span class="role-icon">🚘</span>
+                <span class="role-title">Offer Rides</span>
+                <span class="role-desc">Driver</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-pass">Password</label>
+              <div class="input-wrapper">
+                <input type="password" id="reg-pass" placeholder="Min. 8 chars" minlength="8" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-confirm-pass">Confirm Password</label>
+              <div class="input-wrapper">
+                <input type="password" id="reg-confirm-pass" placeholder="Re-enter password" minlength="8" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="agree-terms" required />
+              <span>I agree to the <a href="#" class="terms-link">Terms of Service</a> & <a href="#" class="terms-link">Privacy Policy</a></span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+      </section>
+
+      <!-- Footer / Switch Prompt -->
+      <footer class="auth-footer">
+        <p id="footer-login-prompt">
+          Don't have an account? <a href="#" onclick="switchAuthTab('register'); return false;">Create one now</a>
+        </p>
+        <p id="footer-register-prompt" class="hidden">
+          Already registered? <a href="#" onclick="switchAuthTab('login'); return false;">Sign in here</a>
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
