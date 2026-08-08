@@ -36,4 +36,7 @@ const rideSchema = new mongoose.Schema(
     { $inc: { availableSeats: -1 } },
 );
 
+rideSchema.index({pickupLocation: '2dsphere', travelDateTime: 1, status: 1});
+rideSchema.index({destination: '2dsphere', travelDateTime: 1, status: 1});
+
 module.exports = mongoose.model("Ride", rideSchema);
