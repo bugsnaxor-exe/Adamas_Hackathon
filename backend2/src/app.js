@@ -15,7 +15,7 @@ const walletRoutes = require("./features/wallet/wallet.routes");
 app.use("/api/users", userRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/rides", rideRoutes);
-app.use("/api/rides", vehicleRoutes);
-app.use("/api/rides", walletRoutes);
+app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/wallet", walletRoutes);
 
 module.exports = app;
