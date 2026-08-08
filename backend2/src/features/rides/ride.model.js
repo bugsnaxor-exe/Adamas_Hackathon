@@ -24,7 +24,7 @@ const rideSchema = new mongoose.Schema(
         },
         travelDate: { type: Date, required: true },
         totalSeats: { type: Number, required: true, min: 1 },
-        availableSeats: { type: Number, required: true, min: 0 },
+        availableSeats: { type: Number, required: true },
         farePerSeat: { type: Number, required: true, min: 0 },
         status: {
             type: String,
@@ -33,6 +33,7 @@ const rideSchema = new mongoose.Schema(
         },
     },
     { timestamps: true },
+    { $inc: { availableSeats: -1 } },
 );
 
 module.exports = mongoose.model("Ride", rideSchema);
