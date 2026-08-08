@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CommutePool - Smart Carpooling Login & Sign Up</title>
-  <meta name="description" content="Sign in or create an account to start sharing rides and reducing your daily commute costs." />
+  <meta name="description"
+    content="Sign in or create an account to start sharing rides and reducing your daily commute costs." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg-dark: #0f172a;
@@ -79,8 +82,13 @@
     }
 
     @keyframes floatGlobe {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(60px, 40px) scale(1.1); }
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(60px, 40px) scale(1.1);
+      }
     }
 
     .container {
@@ -216,7 +224,9 @@
       align-items: center;
     }
 
-    .forgot-link, .otp-link, .terms-link {
+    .forgot-link,
+    .otp-link,
+    .terms-link {
       color: var(--primary);
       font-size: 0.8rem;
       text-decoration: none;
@@ -227,7 +237,9 @@
       transition: var(--transition);
     }
 
-    .forgot-link:hover, .otp-link:hover, .terms-link:hover {
+    .forgot-link:hover,
+    .otp-link:hover,
+    .terms-link:hover {
       text-decoration: underline;
       color: var(--input-focus);
     }
@@ -258,7 +270,8 @@
       color: rgba(148, 163, 184, 0.6);
     }
 
-    input:focus, select:focus {
+    input:focus,
+    select:focus {
       border-color: var(--input-focus);
       box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
     }
@@ -419,6 +432,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="background-globes">
     <div class="globe globe-1"></div>
@@ -428,11 +442,13 @@
   <div class="container">
     <header class="brand-header">
       <div class="logo">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
-          <circle cx="7" cy="17" r="2"/>
-          <path d="M9 17h6"/>
-          <circle cx="17" cy="17" r="2"/>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+          <circle cx="7" cy="17" r="2" />
+          <path d="M9 17h6" />
+          <circle cx="17" cy="17" r="2" />
         </svg>
         <span>Commute<strong>Pool</strong></span>
       </div>
@@ -455,11 +471,17 @@
       <section id="panel-login" class="auth-panel">
         <div class="sub-tabs">
           <button id="login-type-email" class="sub-tab-btn active" onclick="switchLoginMethod('email')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
             Email
           </button>
           <button id="login-type-phone" class="sub-tab-btn" onclick="switchLoginMethod('phone')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
             Phone Number
           </button>
         </div>
@@ -480,7 +502,8 @@
             </div>
             <div class="input-wrapper">
               <input type="password" id="login-email-pass" placeholder="••••••••" required />
-              <button type="button" class="toggle-pass" onclick="togglePass('login-email-pass', this)" aria-label="Toggle password">👁️</button>
+              <button type="button" class="toggle-pass" onclick="togglePass('login-email-pass', this)"
+                aria-label="Toggle password">👁️</button>
             </div>
           </div>
 
@@ -549,30 +572,13 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <div class="role-selector">
-              <label class="role-card active">
-                <input type="radio" name="user-role" value="rider" checked onclick="updateRoleSelection(this)" />
-                <span class="role-icon">🚗</span>
-                <span class="role-title">Find Rides</span>
-                <span class="role-desc">Passenger</span>
-              </label>
-
-              <label class="role-card">
-                <input type="radio" name="user-role" value="driver" onclick="updateRoleSelection(this)" />
-                <span class="role-icon">🚘</span>
-                <span class="role-title">Offer Rides</span>
-                <span class="role-desc">Driver</span>
-              </label>
-            </div>
-          </div>
-
           <div class="form-row">
             <div class="form-group">
               <label for="reg-pass">Password</label>
               <div class="input-wrapper">
                 <input type="password" id="reg-pass" placeholder="Min. 8 chars" minlength="8" required />
-                <button type="button" class="toggle-pass" onclick="togglePass('reg-pass', this)" aria-label="Toggle password">👁️</button>
+                <button type="button" class="toggle-pass" onclick="togglePass('reg-pass', this)"
+                  aria-label="Toggle password">👁️</button>
               </div>
             </div>
 
@@ -580,7 +586,8 @@
               <label for="reg-confirm-pass">Confirm Password</label>
               <div class="input-wrapper">
                 <input type="password" id="reg-confirm-pass" placeholder="Re-enter password" minlength="8" required />
-                <button type="button" class="toggle-pass" onclick="togglePass('reg-confirm-pass', this)" aria-label="Toggle confirm password">👁️</button>
+                <button type="button" class="toggle-pass" onclick="togglePass('reg-confirm-pass', this)"
+                  aria-label="Toggle confirm password">👁️</button>
               </div>
             </div>
           </div>
@@ -588,7 +595,8 @@
           <div class="form-options">
             <label class="checkbox-label">
               <input type="checkbox" id="agree-terms" required />
-              <span>I agree to the <a href="#" class="terms-link">Terms of Service</a> & <a href="#" class="terms-link">Privacy Policy</a></span>
+              <span>I agree to the <a href="#" class="terms-link">Terms of Service</a> & <a href="#"
+                  class="terms-link">Privacy Policy</a></span>
             </label>
           </div>
 
@@ -738,4 +746,5 @@
     }
   </script>
 </body>
+
 </html>
