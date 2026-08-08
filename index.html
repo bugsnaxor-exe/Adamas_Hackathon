@@ -3,347 +3,520 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CommutePlus - Enterprise Mobility</title>
+  <title>CommutePool - Enterprise Carpooling</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-app: #f4f6fa;
-      --bg-sidebar: #ffffff;
-      --bg-card: #ffffff;
-      --bg-input: #f8fafc;
-      --border-color: #e2e8f0;
-      --border-light: #edf2f7;
+      --bg-cream: #f4f2ea;
+      --bg-cream-surface: #fdfcf7;
+      --bg-beige-card: #eae7dc;
+      --bg-beige-hover: #f0eddf;
+      --border-subtle: #dcd7c9;
       --text-dark: #0f172a;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --text-light: #94a3b8;
-      --primary-indigo: #4f46e5;
-      --primary-indigo-hover: #4338ca;
-      --primary-indigo-light: #eeebfe;
-      --primary-indigo-badge: #e0e7ff;
-      --accent-green-bg: #d1fae5;
-      --accent-green-text: #059669;
-      --accent-red-bg: #ffe4e6;
-      --accent-red-text: #e11d48;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
+      --text-muted: #475569;
+      --primary-navy: #0c3259;
+      --primary-navy-hover: #07223e;
+      --map-bg: #dbe5d8;
+      --map-grid: #aabfa7;
+      --map-road: #8eaa8a;
+      --map-route: #1d4ed8;
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
       --radius-pill: 9999px;
-      --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.03);
-      --shadow-dropdown: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --transition: all 0.2s ease-in-out;
+      --shadow-soft: 0 10px 30px rgba(12, 50, 89, 0.06);
+      --shadow-floating: 0 20px 50px rgba(12, 50, 89, 0.14);
+      --shadow-tactile: 0 6px 18px rgba(12, 50, 89, 0.16);
+      --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
 
     body {
-      background-color: #d1d5db;
-      color: var(--text-main);
+      background-color: #e2decb;
+      color: var(--text-dark);
       min-height: 100vh;
       display: flex; justify-content: center; align-items: center;
       padding: 0; overflow-x: hidden;
     }
 
-    .app-viewport-frame {
-      width: 100%; max-width: 1280px; height: 860px; background: var(--bg-app);
-      border-radius: 24px; border: 12px solid #374151; display: grid;
-      grid-template-columns: 240px 1fr; overflow: hidden; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3); position: relative;
+    .app-container {
+      width: 100%; max-width: 480px; min-height: 100vh; background: var(--bg-cream);
+      display: flex; flex-direction: column; position: relative; overflow: hidden; box-shadow: var(--shadow-floating);
     }
 
-    @media (max-width: 1024px) {
-      .app-viewport-frame { max-width: 100vw; height: 100vh; border-radius: 0; border: none; grid-template-columns: 1fr; }
+    @media (min-width: 992px) {
+      .app-container {
+        max-width: 1140px; height: 880px; min-height: 880px; border-radius: 36px;
+        border: 1px solid var(--border-subtle); display: grid; grid-template-columns: 340px 1fr; margin: 20px;
+      }
     }
 
-    .cp-sidebar {
-      background: var(--bg-sidebar); border-right: 1px solid var(--border-color);
-      padding: 24px 16px; display: flex; flex-direction: column; justify-content: space-between; z-index: 20;
+    .desktop-sidebar {
+      background: var(--bg-cream-surface); border-right: 1px solid var(--border-subtle);
+      padding: 32px 24px; display: flex; flex-direction: column; justify-content: space-between;
     }
-    @media (max-width: 800px) { .cp-sidebar { display: none !important; } }
+    @media (max-width: 991px) { .desktop-sidebar { display: none !important; } }
 
-    .brand-section { padding: 0 8px; margin-bottom: 32px; }
-    .brand-name { font-size: 1.15rem; font-weight: 800; color: var(--primary-indigo); display: flex; align-items: center; gap: 8px; }
-    .brand-subtitle { font-size: 0.68rem; font-weight: 800; color: var(--text-light); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 2px; }
+    .brand-title { font-size: 1.4rem; font-weight: 900; color: var(--primary-navy); margin-bottom: 32px; display: flex; align-items: center; gap: 12px; }
+    .brand-icon-box { width: 44px; height: 44px; border-radius: 14px; background: var(--primary-navy); color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-tactile); }
 
-    .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
-      border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 600;
-      color: var(--text-muted); cursor: pointer; transition: var(--transition); position: relative;
+    .top-header-bar {
+      height: 72px; padding: 0 28px; display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg-cream-surface); border-bottom: 1px solid var(--border-subtle); z-index: 40;
     }
-    .nav-item:hover { background: var(--bg-app); color: var(--text-dark); }
-    .nav-item.active { background: var(--primary-indigo-light); color: var(--primary-indigo); font-weight: 700; }
-    .nav-item.active::after { content: ''; position: absolute; right: 0; top: 6px; bottom: 6px; width: 4px; background: var(--primary-indigo); border-radius: 4px 0 0 4px; }
+    .user-name-title { font-size: 1.25rem; font-weight: 800; color: var(--text-dark); }
 
-    .sidebar-bottom { display: flex; flex-direction: column; gap: 16px; }
-    .btn-sidebar-cta {
-      width: 100%; background: var(--primary-indigo); color: #ffffff; border: none;
-      padding: 12px; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
+    .profile-avatar-btn {
+      width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--primary-navy);
+      background: var(--bg-beige-card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--primary-navy); transition: var(--transition); font-size: 1.2rem;
     }
-    .btn-sidebar-cta:hover { background: var(--primary-indigo-hover); }
+    .profile-avatar-btn:hover { transform: scale(1.08); }
 
-    .user-sidebar-profile { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-color); }
-    .user-avatar-sm { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-    .user-info-text { flex: 1; overflow: hidden; }
-    .user-name-title { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
-    .user-dept-subtitle { font-size: 0.72rem; color: var(--text-light); }
+    .map-viewport-container {
+      width: 100%; height: 300px; background: var(--map-bg); position: relative; overflow: hidden;
+      border-bottom: 2px solid #b2c6af; transition: height 0.45s ease;
+    }
+    .map-viewport-container.expanded { height: calc(100% - 72px); }
 
-    .cp-main-workspace { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; background: var(--bg-app); }
+    .svg-map { width: 100%; height: 100%; }
+    .map-grid-line { stroke: var(--map-grid); stroke-width: 1.5; }
+    .map-main-road { stroke: var(--map-road); stroke-width: 5; }
 
-    .cp-header { height: 64px; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-app); z-index: 10; }
-    .header-search-bar { width: 340px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-pill); padding: 8px 16px; display: flex; align-items: center; gap: 10px; }
-    .header-search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.85rem; }
+    .route-polyline {
+      stroke: var(--map-route); stroke-width: 4; stroke-linecap: round;
+      stroke-dasharray: 8 4; animation: routeAnim 20s linear infinite;
+    }
+    @keyframes routeAnim { to { stroke-dashoffset: -500; } }
 
-    .header-actions-right { display: flex; align-items: center; gap: 16px; }
-    .icon-btn-circle { width: 36px; height: 36px; border-radius: 50%; background: #ffffff; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; position: relative; }
-    .notification-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-red-text); }
+    .slide-map-toggle-btn {
+      position: absolute; top: 14px; right: 16px; background: var(--bg-cream-surface);
+      border: 1px solid var(--border-subtle); padding: 8px 18px; border-radius: var(--radius-pill);
+      font-size: 0.78rem; font-weight: 800; color: var(--primary-navy); cursor: pointer; z-index: 30; box-shadow: var(--shadow-soft);
+    }
 
-    .cp-content-scroll { flex: 1; padding: 0 32px 32px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+    .rapido-sliding-sheet {
+      flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+      background: var(--bg-cream); border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);
+      box-shadow: 0 -10px 30px rgba(12, 50, 89, 0.08); position: relative; z-index: 20;
+    }
 
-    .dash-welcome-row { display: flex; justify-content: space-between; align-items: flex-end; }
-    .dash-title { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); }
-    .dash-sub { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+    .beige-card {
+      background: var(--bg-beige-card); border-radius: var(--radius-lg); padding: 20px 24px;
+      border: 1px solid var(--border-subtle); box-shadow: var(--shadow-soft); transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .beige-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary-navy); }
+    .beige-card:hover { transform: translateY(-2px); background: var(--bg-beige-hover); }
 
-    .dash-metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .metric-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between; }
-    .metric-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .metric-icon-box { width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: var(--primary-indigo); font-size: 1.1rem; }
-    .trend-badge { background: var(--accent-green-bg); color: var(--accent-green-text); font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 4px; }
-    .metric-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
-    .metric-val { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-top: 4px; }
+    .btn-navy-primary {
+      background: var(--primary-navy); color: #ffffff; border: none; padding: 14px 24px;
+      border-radius: var(--radius-md); font-size: 0.94rem; font-weight: 800; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-tactile); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-navy-primary:hover { background: var(--primary-navy-hover); transform: translateY(-2px); }
 
-    .dash-middle-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
-    .cp-card-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-card); }
-    .card-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .card-box-title { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); }
-    .link-view-all { font-size: 0.82rem; font-weight: 700; color: var(--primary-indigo); cursor: pointer; }
+    .input-pill-field {
+      width: 100%; background: #e2ded2; border: 1.5px solid #d2cdbe; padding: 14px 20px;
+      border-radius: var(--radius-pill); font-size: 0.95rem; color: var(--text-dark); display: flex; align-items: center; gap: 12px; margin-bottom: 12px; transition: var(--transition);
+    }
+    .input-pill-field:focus-within { border-color: var(--primary-navy); background: #ffffff; }
+    .input-pill-field input, .input-pill-field select { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; color: var(--text-dark); font-weight: 600; }
 
-    .timeline-item { display: flex; gap: 16px; padding: 16px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-light); margin-bottom: 12px; }
-    .timeline-dots { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px 0; }
-    .dot-blue { width: 8px; height: 8px; border-radius: 50%; background: var(--primary-indigo); }
-    .dot-line { width: 2px; flex: 1; background: #cbd5e1; margin: 4px 0; }
-    .dot-green { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--accent-green-text); background: #ffffff; }
-    .timeline-details { flex: 1; }
-    .timeline-row { display: flex; justify-content: space-between; align-items: center; }
-    .timeline-time { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
-    .timeline-place { font-size: 0.92rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
-    .status-badge-purple { background: var(--primary-indigo-badge); color: var(--primary-indigo); font-size: 0.72rem; font-weight: 800; padding: 2px 10px; border-radius: var(--radius-pill); }
+    .eta-communication-bar {
+      background: #ffffff; border-radius: var(--radius-lg); padding: 20px;
+      box-shadow: var(--shadow-floating); text-align: center; border: 1px solid var(--border-subtle); margin-top: 12px;
+    }
+    .eta-title-text { font-size: 1.25rem; font-weight: 900; color: var(--primary-navy); margin-bottom: 12px; }
 
-    .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .quick-act-btn { background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: var(--transition); }
-    .quick-act-btn:hover { background: #ffffff; border-color: var(--primary-indigo); transform: translateY(-2px); }
-    .act-icon { font-size: 1.4rem; color: var(--primary-indigo); }
-    .act-label { font-size: 0.82rem; font-weight: 700; color: var(--text-dark); }
+    .action-pill-btn {
+      background: var(--bg-beige-card); border: 1px solid var(--border-subtle); padding: 10px 20px;
+      border-radius: var(--radius-pill); font-size: 0.88rem; font-weight: 800; color: var(--primary-navy); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin: 0 4px;
+    }
 
-    .find-ride-layout { display: grid; grid-template-columns: 440px 1fr; gap: 24px; height: 100%; }
-    .find-search-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-card); }
-    .cp-input-box { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-dark); }
-    .cp-input-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.9rem; }
-
-    .driver-rec-card { background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; }
-    .driver-head-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
-    .driver-photo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-    .driver-title-name { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); }
-    .driver-title-sub { font-size: 0.78rem; color: var(--text-muted); }
-    .driver-price-right { margin-left: auto; text-align: right; }
-    .driver-price-amount { font-size: 1.1rem; font-weight: 800; color: var(--primary-indigo); }
-    .driver-price-time { font-size: 0.75rem; color: var(--text-light); }
-
-    .map-canvas-container { background: #e5e7eb; border-radius: var(--radius-lg); border: 1px solid var(--border-color); position: relative; overflow: hidden; min-height: 500px; }
-    .map-control-widgets { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-    .map-control-btn { width: 36px; height: 36px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .map-bottom-selected-overlay { position: absolute; bottom: 20px; right: 20px; left: 20px; background: #ffffff; border-radius: var(--radius-lg); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-dropdown); border: 1px solid var(--border-color); }
-    .btn-sos-danger { position: absolute; bottom: 20px; right: 20px; background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; padding: 10px 20px; border-radius: var(--radius-pill); font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-
-    .analytics-grid-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .analytics-chart-split { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-
-    .btn-primary-indigo { background: var(--primary-indigo); color: #ffffff; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: var(--transition); }
-    .btn-primary-indigo:hover { background: var(--primary-indigo-hover); }
-    .btn-outline { background: #ffffff; border: 1px solid var(--border-color); color: var(--text-dark); padding: 8px 16px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+    .bottom-nav-2bar {
+      height: 72px; background: #ffffff; border-top: 1px solid var(--border-subtle);
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center; z-index: 50;
+    }
+    .nav-tab-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 0.85rem; font-weight: 700; transition: var(--transition); height: 100%;
+    }
+    .nav-tab-btn.active { color: var(--primary-navy); font-weight: 900; background: var(--bg-cream); border-top: 3px solid var(--primary-navy); }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="app-viewport-frame">
-    <!-- LEFT SIDEBAR -->
-    <aside class="cp-sidebar">
-      <div>
-        <div class="brand-section">
-          <div class="brand-name">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-            <span>CommutePlus</span>
-          </div>
-          <div class="brand-subtitle">ENTERPRISE MOBILITY</div>
-        </div>
 
-        <ul class="nav-menu">
-          <li id="nav-dash" class="nav-item active" onclick="showTab('dash')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            <span>Dashboard</span>
-          </li>
-          <li id="nav-find" class="nav-item" onclick="showTab('find')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>Find Ride</span>
-          </li>
-          <li id="nav-offer" class="nav-item" onclick="showTab('offer')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-            <span>Offer Ride</span>
-          </li>
-          <li id="nav-trips" class="nav-item" onclick="showTab('trips')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>My Trips</span>
-          </li>
-          <li id="nav-wallet" class="nav-item" onclick="showTab('wallet')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <span>Wallet</span>
-          </li>
-          <li id="nav-reports" class="nav-item" onclick="showTab('reports')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>Reports</span>
-          </li>
-          <li id="nav-vehicles" class="nav-item" onclick="showTab('vehicles')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17l-1 3m15-3l1 3"/></svg>
-            <span>Vehicles</span>
-          </li>
-        </ul>
+  <!-- AUTHENTICATION SCREEN (REQUIREMENT 4) -->
+  <div id="auth-screen" class="app-container" style="justify-content: center; align-items: center; padding: 24px;">
+    <div class="beige-card" style="width: 100%; max-width: 420px; flex-direction: column; padding: 32px; background: #fdfcf7;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="brand-icon-box" style="margin: 0 auto 12px auto; width: 52px; height: 52px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 900; color: #0c3259;">Commute<strong>Pool</strong></h2>
+        <p style="font-size: 0.85rem; color: #475569; margin-top: 4px;">Enterprise Mobility Platform</p>
       </div>
 
-      <div class="sidebar-bottom">
-        <button class="btn-sidebar-cta" onclick="showTab('find')">
-          <span>+</span> <span>Book New Trip</span>
-        </button>
-        <div class="user-sidebar-profile">
-          <img class="user-avatar-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" />
-          <div class="user-info-text">
-            <div class="user-name-title">Alex Rivera</div>
-            <div class="user-dept-subtitle">Engineering Dept</div>
-          </div>
+      <!-- LOGIN FORM -->
+      <form id="form-login" onsubmit="event.preventDefault(); doAuth('Alex');">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #0c3259; margin-bottom: 16px;">Sign In to Account</h3>
+        <div class="input-pill-field"><span>✉️</span><input type="email" placeholder="Enter your email..." value="alex@company.com" required /></div>
+        <div class="input-pill-field" style="position: relative;">
+          <span>🔒</span>
+          <input id="l-pass" type="password" placeholder="Enter password..." value="password123" required />
+          <button type="button" onclick="togglePass('l-pass')" style="position: absolute; right: 16px; background: none; border: none; cursor: pointer;">👁️</button>
         </div>
+        <button type="submit" class="btn-navy-primary" style="width: 100%; padding: 16px; border-radius: 14px; margin-top: 8px;">Login</button>
+        <div style="text-align: center; margin-top: 16px;">
+          <span style="font-size: 0.88rem; color: #475569;">Don't have an account? </span>
+          <button type="button" onclick="switchAuth('reg')" style="background: none; border: none; color: #0c3259; font-weight: 800; text-decoration: underline; cursor: pointer;">Create new account</button>
+        </div>
+      </form>
+
+      <!-- CREATE ACCOUNT FORM -->
+      <form id="form-register" class="hidden" onsubmit="event.preventDefault(); doAuth(document.getElementById('r-name').value || 'Alex');">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #0c3259; margin-bottom: 16px;">Create New Account</h3>
+        <div class="input-pill-field"><span>👤</span><input id="r-name" type="text" placeholder="Enter name..." required /></div>
+        <div class="input-pill-field"><span>📱</span><input type="tel" placeholder="Enter phone number..." required /></div>
+        <div class="input-pill-field"><span>✉️</span><input type="email" placeholder="Enter your email..." required /></div>
+        <div class="input-pill-field" style="position: relative;">
+          <span>🔒</span>
+          <input id="r-pass" type="password" placeholder="Create password..." required />
+          <button type="button" onclick="togglePass('r-pass')" style="position: absolute; right: 16px; background: none; border: none; cursor: pointer;">👁️</button>
+        </div>
+        <div class="input-pill-field" style="position: relative;">
+          <span>🔒</span>
+          <input id="rc-pass" type="password" placeholder="Re-enter your password..." required />
+          <button type="button" onclick="togglePass('rc-pass')" style="position: absolute; right: 16px; background: none; border: none; cursor: pointer;">👁️</button>
+        </div>
+        <button type="submit" class="btn-navy-primary" style="width: 100%; padding: 16px; border-radius: 14px; margin-top: 8px;">Create Account</button>
+        <div style="text-align: center; margin-top: 16px;">
+          <span style="font-size: 0.88rem; color: #475569;">Already have an account? </span>
+          <button type="button" onclick="switchAuth('log')" style="background: none; border: none; color: #0c3259; font-weight: 800; text-decoration: underline; cursor: pointer;">Login option</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATED APP WORKSPACE -->
+  <div id="main-app" class="app-container hidden">
+    <aside class="desktop-sidebar">
+      <div>
+        <div class="brand-title">
+          <div class="brand-icon-box">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
+          </div>
+          <span>Commute<strong>Pool</strong></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button id="d-book-btn" class="btn-navy-primary" style="width: 100%; padding: 14px;" onclick="switchTab('book')">📍 Book Ride</button>
+          <button id="d-offer-btn" class="btn-navy-primary" style="width: 100%; padding: 14px; background: #e2ded2; color: #475569;" onclick="switchTab('offer')">🚗 Offer Ride</button>
+        </div>
+      </div>
+      <div style="padding: 18px; background: var(--bg-beige-card); border-radius: 16px; border: 1px solid var(--border-subtle);">
+        <div style="font-size: 0.82rem; color: var(--text-muted);">Wallet Balance</div>
+        <div style="font-size: 1.4rem; font-weight: 900; color: var(--primary-navy);">₹ <span id="side-w">1,250</span>.00</div>
+        <button style="border: none; background: none; color: #0c3259; font-weight: 800; font-size: 0.82rem; margin-top: 8px; cursor: pointer;" onclick="openProfile()">Open Profile & Wallet ➔</button>
       </div>
     </aside>
 
-    <!-- MAIN WORKSPACE AREA -->
-    <div class="cp-main-workspace">
-      <header class="cp-header">
-        <div class="header-search-bar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" placeholder="Search routes, colleagues..." />
-        </div>
-        <div class="header-actions-right">
-          <div class="icon-btn-circle"><span class="notification-dot"></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-          <div class="icon-btn-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-          <img class="user-avatar-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" />
-        </div>
+    <div style="flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; background: var(--bg-cream);">
+      
+      <!-- TOP HEADER BAR (REQUIREMENT 1) -->
+      <header class="top-header-bar">
+        <div class="user-name-title">Hello, <strong id="u-display">Alex</strong></div>
+        <button class="profile-avatar-btn" onclick="openProfile()" title="Profile & Wallet">👤</button>
       </header>
 
-      <div class="cp-content-scroll">
-        <!-- TAB 1: DASHBOARD -->
-        <div id="tab-dash-view">
-          <div class="dash-welcome-row" style="margin-bottom: 24px;">
-            <div>
-              <h1 class="dash-title">Good morning, Alex.</h1>
-              <p class="dash-sub">Here is your commute overview for this week.</p>
-            </div>
-            <div style="display: flex; gap: 10px;">
-              <button class="btn-outline">⚡ Filter</button>
-              <button class="btn-primary-indigo" onclick="showTab('find')">+ New Route</button>
-            </div>
-          </div>
+      <!-- 1. BOOK RIDE TAB (REQUIREMENT 1) -->
+      <div id="tab-book" style="display: flex; flex-direction: column; flex: 1; position: relative; overflow: hidden;">
+        <div id="m-box" class="map-viewport-container">
+          <button id="m-btn" class="slide-map-toggle-btn" onclick="toggleMap()">▲ Full Interactive Map</button>
+          <svg class="svg-map" viewBox="0 0 400 300">
+            <line x1="40" y1="0" x2="40" y2="300" class="map-grid-line" />
+            <line x1="120" y1="0" x2="120" y2="300" class="map-grid-line" />
+            <line x1="200" y1="0" x2="200" y2="300" class="map-grid-line" />
+            <line x1="280" y1="0" x2="280" y2="300" class="map-grid-line" />
+            <line x1="50" y1="280" x2="350" y2="30" class="map-main-road" />
+            <polyline id="r-polyline" points="120,240 230,120 280,60" fill="none" class="route-polyline hidden" />
+            <circle cx="120" cy="240" r="6" fill="#ef4444" />
+            <circle cx="280" cy="60" r="6" fill="#1d4ed8" />
+            <text x="285" y="55" font-size="13">🚗</text>
+          </svg>
+        </div>
 
-          <div class="dash-metrics-grid" style="margin-bottom: 24px;">
-            <div class="metric-card"><div class="metric-card-top"><div class="metric-icon-box">🚗</div><span class="trend-badge">↗ 12%</span></div><div><div class="metric-label">Total Trips (Month)</div><div class="metric-val">24</div></div></div>
-            <div class="metric-card"><div class="metric-card-top"><div class="metric-icon-box" style="color: #10b981;">🌱</div><span class="trend-badge">↗ 8%</span></div><div><div class="metric-label">CO2 Saved (kg)</div><div class="metric-val">142.5</div></div></div>
-            <div class="metric-card"><div class="metric-card-top"><div class="metric-icon-box" style="color: #3b82f6;">🐷</div></div><div><div class="metric-label">Monthly Savings</div><div class="metric-val">$128.00</div></div></div>
-          </div>
+        <div id="rapido-sheet" class="rapido-sliding-sheet">
+          <form id="view-search-form" onsubmit="event.preventDefault(); showRiders();">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0c3259; margin-bottom: 14px;">Where are you travelling?</h3>
+            <div class="input-pill-field"><span>📍</span><input type="text" value="AIIMS Hospital" placeholder="Where to next..." required /></div>
+            <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 12px;">
+              <div class="input-pill-field" style="margin-bottom:0;"><span>📅</span><input type="date" value="2026-08-09" required /></div>
+              <div class="input-pill-field" style="margin-bottom:0;"><span>👤</span><span>1 Seat</span></div>
+            </div>
+            <button type="submit" class="btn-navy-primary" style="width: 100%; padding: 16px; border-radius: 28px; margin-top: 8px;">Find Rider</button>
+          </form>
 
-          <div class="dash-middle-grid">
-            <div class="cp-card-box">
-              <div class="card-box-header"><div class="card-box-title">Upcoming Trips</div><span class="link-view-all" onclick="showTab('trips')">View All</span></div>
-              <div class="timeline-item">
-                <div class="timeline-dots"><div class="dot-blue"></div><div class="dot-line"></div><div class="dot-green"></div></div>
-                <div class="timeline-details">
-                  <div class="timeline-row" style="margin-bottom: 4px;"><span class="timeline-time">08:00 AM • Home</span><span style="font-size:0.78rem; color:#64748b;">Driven by Mark T.</span></div>
-                  <div class="timeline-place">123 Willow Creek Dr.</div>
-                  <div class="timeline-row"><span class="timeline-time">08:45 AM • HQ</span><span class="status-badge-purple">BOOKED</span></div>
-                  <div class="timeline-place" style="margin-bottom:0;">Tech Campus, Bldg B</div>
+          <div id="view-riders-list" class="hidden">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0c3259; margin-bottom: 14px;">Available Riders Nearby</h3>
+            <div class="beige-card" style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 1.05rem; font-weight: 800;">Raju Paul <span style="font-size: 0.8rem; color: #10b981;">4.9 ★</span></div>
+                  <div style={{ fontSize: '0.82rem', color: '#475569', margin: '4px 0' }}>Maruti WagonR • B16 ➔ AIIMS</div>
+                  <div style="font-size: 1.1rem; font-weight: 900; color: #0c3259;">₹ 80 / seat</div>
                 </div>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-              <div class="cp-card-box">
-                <div class="card-box-title" style="margin-bottom: 14px;">Quick Actions</div>
-                <div class="quick-actions-grid">
-                  <div class="quick-act-btn" onclick="showTab('find')"><span class="act-icon">🔍</span><span class="act-label">Find Ride</span></div>
-                  <div class="quick-act-btn" onclick="showTab('offer')"><span class="act-icon">🚗</span><span class="act-label">Offer Ride</span></div>
-                </div>
+                <button class="btn-navy-primary" style="padding: 10px 18px;" onclick="selectRider('Raju Paul', 80)">Select Rider</button>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- TAB 2: FIND RIDE -->
-        <div id="tab-find-view" class="hidden">
-          <div class="find-ride-layout">
-            <div class="find-search-card">
-              <h3 style="font-size: 1.1rem; font-weight: 800;">Find a Ride</h3>
-              <div class="cp-input-box"><span>📍</span><input type="text" value="Downtown HQ" /></div>
-              <div class="cp-input-box"><span>🏁</span><input type="text" value="Tech Park North, Bldg C" /></div>
-              <button class="btn-primary-indigo" style="width: 100%; padding: 12px;" onclick="alert('Searching Rides...')">🔍 Search Rides</button>
+          <div id="view-active-eta" class="hidden">
+            <div class="eta-communication-bar">
+              <div class="eta-title-text">Coming in 2 minutes</div>
+              <div>
+                <button class="action-pill-btn" onclick="alert('Calling Rider...')">📞 Call Rider</button>
+                <button class="action-pill-btn" onclick="alert('SMS Rider...')">💬 SMS Rider</button>
+              </div>
             </div>
 
-            <div class="map-canvas-container">
-              <svg width="100%" height="100%" viewBox="0 0 800 600" style="background: #e5e7eb;">
-                <line x1="100" y1="0" x2="100" y2="600" stroke="#d1d5db" stroke-width="2" />
-                <line x1="500" y1="0" x2="500" y2="600" stroke="#d1d5db" stroke-width="2" />
-                <polyline points="150,450 350,380 650,150" fill="none" stroke="#4f46e5" stroke-width="6" />
-                <circle cx="150" cy="450" r="10" fill="#4f46e5" />
-                <circle cx="650" cy="150" r="10" fill="#10b981" />
-              </svg>
+            <div class="beige-card" style="margin-top: 14px; background: #fdfcf7;">
+              <div style="font-size: 0.82rem; color: #475569; font-weight: 800;">RIDE DIRECTION DETAILS</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: #0c3259; margin: 4px 0;">B16 ➔ AIIMS Hospital</div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid #dcd7c9;">
+                <div>
+                  <div style="font-size: 0.78rem; color: #475569;">Total Fee Amount</div>
+                  <div id="pay-amt-txt" style="font-size: 1.4rem; font-weight: 900; color: #0c3259;">₹ 80.00</div>
+                </div>
+                <button class="btn-navy-primary" onclick="openPayModal()">Pay Ride Fee</button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- TAB 3: MY TRIPS / MAP -->
-        <div id="tab-trips-view" class="hidden" style="height: 100%;">
-          <div class="map-canvas-container" style="height: 100%; min-height: 600px;">
-            <svg width="100%" height="100%" viewBox="0 0 900 650" style="background: #93c5fd;">
-              <rect x="150" y="50" width="600" height="550" rx="16" fill="#e5e7eb" />
-              <path d="M 250,450 Q 500,550 700,200" fill="none" stroke="#818cf8" stroke-width="6" stroke-dasharray="8 6" />
-              <circle cx="520" cy="280" r="22" fill="#4f46e5" />
-            </svg>
-            <button class="btn-sos-danger"><span>📍</span> <span>Safety / SOS</span></button>
-          </div>
+      <!-- 2. OFFER RIDE TAB (REQUIREMENT 3) -->
+      <div id="tab-offer" class="hidden" style="display: flex; flex-direction: column; flex: 1; position: relative; overflow: hidden;">
+        <div id="of-m-box" class="map-viewport-container">
+          <button id="of-m-btn" class="slide-map-toggle-btn" onclick="toggleOfferMap()">▲ Full Interactive Map</button>
+          <svg class="svg-map" viewBox="0 0 400 300">
+            <line x1="40" y1="0" x2="40" y2="300" class="map-grid-line" />
+            <line x1="120" y1="0" x2="120" y2="300" class="map-grid-line" />
+            <line x1="50" y1="280" x2="350" y2="30" class="map-main-road" />
+            <polyline id="of-route" points="80,260 200,140 320,50" fill="none" stroke="#0c3259" stroke-width="6" class="hidden" />
+            <circle cx="320" cy="50" r="6" fill="#ef4444" />
+            <text x="325" y="45" font-size="13">🚘</text>
+          </svg>
         </div>
 
-        <!-- TAB 4: REPORTS -->
-        <div id="tab-reports-view" class="hidden">
-          <h1 class="dash-title" style="margin-bottom: 24px;">Analytics Overview</h1>
-          <div class="analytics-grid-4col">
-            <div class="metric-card"><div class="metric-label">Fuel Efficiency</div><div class="metric-val">4.2 L/100km</div></div>
-            <div class="metric-card"><div class="metric-label">Cost per KM</div><div class="metric-val">$0.18</div></div>
-            <div class="metric-card"><div class="metric-label">Org Participation</div><div class="metric-val">64%</div></div>
-            <div class="metric-card"><div class="metric-label">Emissions Saved</div><div class="metric-val">1,240 kg</div></div>
+        <div class="rapido-sliding-sheet">
+          <form onsubmit="event.preventDefault(); listOfferNow();">
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #0c3259; margin-bottom: 14px;">Offer a Commute Ride</h3>
+            <div class="input-pill-field"><span>📍</span><input type="text" value="Sector V to AIIMS Hospital" required /></div>
+            <div class="input-pill-field"><span>🏷️ Price per seat (₹):</span><input type="number" value="75" required /></div>
+            <div class="input-pill-field"><span>🚘 Reg No:</span><input type="text" value="WB02AB1234" required /></div>
+            
+            <div class="beige-card" style="padding: 14px 18px; margin: 10px 0 16px 0; background: #fdfcf7;">
+              <div style="font-size: 0.75rem; font-weight: 800; color: #10b981; margin-bottom: 4px;">✓ AUTOMATICALLY FETCHED DETAILS</div>
+              <div style="font-size: 0.88rem; font-weight: 800;">Vehicle: Tesla Model 3 • White</div>
+              <div style="font-size: 0.82rem; color: #475569;">Owner: Alex Rivera (EMP-9042)</div>
+              <div style="font-size: 0.82rem; color: #475569;">License No: DL-90481239084</div>
+            </div>
+
+            <button type="submit" class="btn-navy-primary" style="width: 100%; padding: 16px; border-radius: 28px;">List Now</button>
+          </form>
+
+          <div id="commuter-pop" class="live-commuter-popup hidden">
+            <h4 style="font-size: 1.1rem; font-weight: 900; color: #0c3259; margin-bottom: 6px;">A Commuter Nearby</h4>
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 12px;">Sarah Jenkins requested 1 seat.</p>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+              <button class="action-pill-btn" onclick="alert('Calling Commuter...')">📞 Call</button>
+              <button class="action-pill-btn" onclick="alert('SMS Commuter...')">💬 SMS</button>
+            </div>
+            <button class="btn-navy-primary" style="width: 100%; padding: 12px;" onclick="acceptCommuter()">View Location & Accept</button>
+          </div>
+
+          <div id="money-pop" class="live-commuter-popup hidden" style="border-color: #10b981; background: #f0fdf4;">
+            <h4 style="font-size: 1.2rem; font-weight: 900; color: #10b981; margin-bottom: 6px;">💰 Money Received ₹ 75.00</h4>
+            <button class="btn-navy-primary" style="width: 100%; padding: 12px; background: #10b981;" onclick="document.getElementById('money-pop').classList.add('hidden')">OK</button>
           </div>
         </div>
+      </div>
+
+      <!-- BOTTOM 2-OPTION NAVIGATION BAR -->
+      <footer class="bottom-nav-2bar">
+        <button id="n-book-btn" class="nav-tab-btn active" onclick="switchTab('book')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
+          <span>Book Ride</span>
+        </button>
+        <button id="n-offer-btn" class="nav-tab-btn" onclick="switchTab('offer')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+          <span>Offer Ride</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- PROFILE DRAWER OVERLAY (REQUIREMENT 2) -->
+  <div id="prof-drawer" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(12, 50, 89, 0.4); backdrop-filter: blur(4px); display: flex; justify-content: flex-end; z-index: 100;">
+    <div style="width: 100%; max-width: 440px; background: #fdfcf7; height: 100%; display: flex; flex-direction: column; padding: 24px; box-shadow: var(--shadow-floating); overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #dcd7c9;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <div class="profile-avatar-btn" style="cursor: default;">👤</div>
+          <div><div id="p-name" style="font-size: 1.1rem; font-weight: 900; color: #0c3259;">Alex</div><div style="font-size: 0.8rem; color: #475569;">Enterprise Member</div></div>
+        </div>
+        <button onclick="closeProfile()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #0c3259;">✕</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px;">
+        <button id="p-tab-h" onclick="pTab('h')" style="padding: 10px; border-radius: 10px; border: 1px solid #d2cdbe; background: #0c3259; color: #fff; font-weight: 800; font-size: 0.78rem;">Ride History</button>
+        <button id="p-tab-v" onclick="pTab('v')" style="padding: 10px; border-radius: 10px; border: 1px solid #d2cdbe; background: #e2ded2; color: #475569; font-weight: 800; font-size: 0.78rem;">My Vehicle</button>
+        <button id="p-tab-w" onclick="pTab('w')" style="padding: 10px; border-radius: 10px; border: 1px solid #d2cdbe; background: #e2ded2; color: #475569; font-weight: 800; font-size: 0.78rem;">Wallet</button>
+      </div>
+
+      <div id="p-sec-h">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #0c3259; margin-bottom: 14px;">Booked Ride History</h3>
+        <div class="beige-card"><div style="font-size: 0.78rem; color: #0c3259; font-weight: 800;">TRIP #CP-9041 • COMPLETED</div><div style="font-size: 1rem; font-weight: 800; margin: 6px 0;">B16 ➔ AIIMS Hospital</div><div style="font-size: 0.95rem; font-weight: 900; color: #0c3259;">Paid: ₹ 80.00</div></div>
+      </div>
+
+      <div id="p-sec-v" class="hidden">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #0c3259; margin-bottom: 14px;">Registered Vehicles</h3>
+        <div class="beige-card"><div style="font-size: 1.05rem; font-weight: 800;">Tesla Model 3 • White</div><div style="font-size: 0.85rem; color: #475569;">Plate: WB02AB1234</div></div>
+      </div>
+
+      <div id="p-sec-w" class="hidden">
+        <h3 style="font-size: 1rem; font-weight: 800; color: #0c3259; margin-bottom: 12px;">Wallet Balance</h3>
+        <div style="background: #0c3259; color: #ffffff; padding: 20px; border-radius: 16px; margin-bottom: 20px;"><div style="font-size: 2.2rem; font-weight: 900; color: #a7f3d0;">₹ <span id="w-disp">1250</span>.00</div></div>
+        <form onsubmit="event.preventDefault(); rechargeW();">
+          <label style="font-size: 0.82rem; font-weight: 800; color: #0c3259;">Enter Amount to Recharge (₹)</label>
+          <div class="input-pill-field"><span>₹</span><input id="w-amt" type="number" value="500" required /></div>
+          <button type="submit" class="btn-navy-primary" style="width: 100%; padding: 14px;">Recharge Wallet</button>
+        </form>
+      </div>
+
+      <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #dcd7c9;">
+        <button onclick="logout()" style="width: 100%; padding: 12px; background: #ffe4e6; color: #ef4444; border: 1px solid #fecdd3; border-radius: 12px; font-weight: 800; cursor: pointer;">Sign Out of Account</button>
       </div>
     </div>
   </div>
 
+  <!-- PAYMENT PAGE MODAL (REQUIREMENT 1) -->
+  <div id="pay-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(12, 50, 89, 0.4); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 100;">
+    <div class="beige-card" style="width: 100%; max-width: 440px; background: #fdfcf7; padding: 28px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.2rem; font-weight: 900; color: #0c3259;">Payment Page</h3>
+        <button onclick="closePayModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer;">✕</button>
+      </div>
+      <div style="padding: 16px; background: #eae7dc; border-radius: 12px; margin-bottom: 20px;">
+        <div style="font-size: 1.5rem; font-weight: 900; color: #0c3259;">Amount: ₹ 80.00</div>
+      </div>
+      <button class="btn-navy-primary" style="width: 100%; padding: 16px;" onclick="confirmPay()">Pay Now (₹ 80.00)</button>
+    </div>
+  </div>
+
   <script>
-    function showTab(t) {
-      ['dash', 'find', 'trips', 'reports'].forEach(tab => {
-        const view = document.getElementById('tab-' + tab + '-view');
-        const nav = document.getElementById('nav-' + tab);
-        if (view) view.classList.add('hidden');
-        if (nav) nav.classList.remove('active');
+    let isMapExp = false;
+    let balance = 1250;
+
+    function togglePass(id) {
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    function doAuth(name) {
+      document.getElementById('u-display').textContent = name;
+      document.getElementById('p-name').textContent = name;
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+    }
+
+    function switchAuth(t) {
+      if (t === 'reg') {
+        document.getElementById('form-login').classList.add('hidden');
+        document.getElementById('form-register').classList.remove('hidden');
+      } else {
+        document.getElementById('form-register').classList.add('hidden');
+        document.getElementById('form-login').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      closeProfile();
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('auth-screen').classList.remove('hidden');
+    }
+
+    function switchTab(t) {
+      if (t === 'book') {
+        document.getElementById('tab-book').classList.remove('hidden');
+        document.getElementById('tab-offer').classList.add('hidden');
+        document.getElementById('n-book-btn').classList.add('active');
+        document.getElementById('n-offer-btn').classList.remove('active');
+      } else {
+        document.getElementById('tab-offer').classList.remove('hidden');
+        document.getElementById('tab-book').classList.add('hidden');
+        document.getElementById('n-offer-btn').classList.add('active');
+        document.getElementById('n-book-btn').classList.remove('active');
+      }
+    }
+
+    function toggleMap() {
+      isMapExp = !isMapExp;
+      const m = document.getElementById('m-box');
+      const b = document.getElementById('m-btn');
+      if (isMapExp) { m.classList.add('expanded'); b.textContent = '▼ Slide Down Sheet'; }
+      else { m.classList.remove('expanded'); b.textContent = '▲ Full Interactive Map'; }
+    }
+
+    function showRiders() {
+      document.getElementById('view-search-form').classList.add('hidden');
+      document.getElementById('view-riders-list').classList.remove('hidden');
+      document.getElementById('r-polyline').classList.remove('hidden');
+    }
+
+    function selectRider(name, price) {
+      document.getElementById('view-riders-list').classList.add('hidden');
+      document.getElementById('view-active-eta').classList.remove('hidden');
+    }
+
+    function openPayModal() { document.getElementById('pay-modal').classList.remove('hidden'); }
+    function closePayModal() { document.getElementById('pay-modal').classList.add('hidden'); }
+    function confirmPay() {
+      closePayModal();
+      alert('Payment Successful!');
+    }
+
+    function listOfferNow() {
+      document.getElementById('of-route').classList.remove('hidden');
+      setTimeout(() => { document.getElementById('commuter-pop').classList.remove('hidden'); }, 1200);
+    }
+
+    function acceptCommuter() {
+      document.getElementById('commuter-pop').classList.add('hidden');
+      setTimeout(() => { document.getElementById('money-pop').classList.remove('hidden'); }, 1000);
+    }
+
+    function openProfile() { document.getElementById('prof-drawer').classList.remove('hidden'); }
+    function closeProfile() { document.getElementById('prof-drawer').classList.add('hidden'); }
+
+    function pTab(t) {
+      ['h', 'v', 'w'].forEach(x => {
+        document.getElementById('p-sec-' + x).classList.add('hidden');
+        document.getElementById('p-tab-' + x).style.background = '#e2ded2';
+        document.getElementById('p-tab-' + x).style.color = '#475569';
       });
-      const activeView = document.getElementById('tab-' + t + '-view');
-      const activeNav = document.getElementById('nav-' + t);
-      if (activeView) activeView.classList.remove('hidden');
-      if (activeNav) activeNav.classList.add('active');
+      document.getElementById('p-sec-' + t).classList.remove('hidden');
+      document.getElementById('p-tab-' + t).style.background = '#0c3259';
+      document.getElementById('p-tab-' + t).style.color = '#fff';
+    }
+
+    function rechargeW() {
+      const amt = parseFloat(document.getElementById('w-amt').value) || 0;
+      balance += amt;
+      document.getElementById('w-disp').textContent = balance;
+      document.getElementById('side-w').textContent = balance;
+      alert('Wallet recharged with ₹ ' + amt + '!');
     }
   </script>
 </body>
