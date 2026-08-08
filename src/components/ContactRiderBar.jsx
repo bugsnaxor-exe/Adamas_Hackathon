@@ -14,11 +14,17 @@ export default function ContactRiderBar({
   smsLabel = 'SMS Rider',
   className = ''
 }) {
+  
   const handleCall = () => {
     if (onCall) {
       onCall();
     } else {
-      alert(`📞 Dialing ${riderName} (${phoneNumber || '+91 98765 43210'})...`);
+      // If a valid phone number exists, open the native phone dialer
+      if (phoneNumber) {
+        window.location.href = `tel:${phoneNumber.replace(/\s+/g, '')}`;
+      } else {
+        alert('Phone number not available for this rider.');
+      }
     }
   };
 
@@ -26,7 +32,12 @@ export default function ContactRiderBar({
     if (onSms) {
       onSms();
     } else {
-      alert(`💬 Opening SMS chat with ${riderName}...`);
+      // If a valid phone number exists, open the native SMS messaging app
+      if (phoneNumber) {
+        window.location.href = `sms:${phoneNumber.replace(/\s+/g, '')}`;
+      } else {
+        alert('Phone number not available for this rider.');
+      }
     }
   };
 

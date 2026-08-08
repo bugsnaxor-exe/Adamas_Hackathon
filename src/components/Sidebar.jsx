@@ -1,6 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Sidebar({ activeTab, setActiveTab, onBookNewTrip }) {
+  const [user, setUser] = useState(null);
+
+  // Fetch the logged-in user's details on mount
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch (err) {
+        console.error('Failed to parse user data from localStorage', err);
+      }
+    }
+  }, []);
+
+  // Dynamically set user details
+  const displayName = user?.name || 'Alex Rivera';
+  // If your backend user model has a department, use it. Otherwise, fallback to showing their email or a default title.
+  const displayRole = user?.email || 'Engineering Dept'; 
+  
+  // Generate dynamic avatar URL based on user's name
+  const avatarUrl = user?.name 
+    ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0c3259&color=ffffff&bold=true`
+    : 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80';
+
   return (
     <aside className="cp-sidebar">
       <div>
@@ -55,10 +79,12 @@ export default function Sidebar({ activeTab, setActiveTab, onBookNewTrip }) {
         </button>
 
         <div className="user-sidebar-profile">
-          <img className="user-avatar-sm" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Alex Rivera" />
+          <img className="user-avatar-sm" src={avatarUrl} alt={displayName} />
           <div className="user-info-text">
-            <div className="user-name-title">Alex Rivera</div>
-            <div className="user-dept-subtitle">Engineering Dept</div>
+            <div className="user-name-title">{displayName}</div>
+            <div className="user-dept-subtitle" style={{ fontSize: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {displayRole}
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import HeaderBar from './components/HeaderBar';
 import BottomNav from './components/BottomNav';
 import BookRide from './components/BookRide';
@@ -7,28 +8,58 @@ import ProfileDrawer from './components/ProfileDrawer';
 import AuthModal from './components/AuthModal';
 import { BookRideIcon, OfferRideIcon } from './components/Icons';
 
+const API_BASE_URL = 'http://localhost:5000/api';
+
 export default function App() {
-  // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState('Alex');
+  // Authentication State - Check localStorage on initial load
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+  const [userName, setUserName] = useState(user?.name || 'Alex');
 
   // Bottom Navigation State: 'book' | 'offer'
   const [activeTab, setActiveTab] = useState('book');
 
   // Profile Drawer State
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  
+  // Wallet State (for the Desktop Sidebar)
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  // Fetch wallet balance when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const fetchWallet = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await axios.get(`${API_BASE_URL}/wallet/${user._id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setWalletBalance(response.data.balance || 0);
+        } catch (error) {
+          console.error('Error fetching wallet for sidebar:', error);
+        }
+      };
+      fetchWallet();
+    }
+  }, [isAuthenticated, user, isProfileOpen]); // Re-fetch if they close the profile drawer (might have recharged)
 
   const handleLoginSuccess = (name) => {
-    setUserName(name);
+    // AuthModal already saved token and user to localStorage
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    setUser(storedUser);
+    setUserName(storedUser?.name || name);
     setIsAuthenticated(true);
   };
 
   const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsAuthenticated(false);
+    setUser(null);
     setIsProfileOpen(false);
   };
 
-  // IF NOT AUTHENTICATED: RENDER REQUIREMENT 4 LOGIN / CREATE ACCOUNT SCREEN
+  // IF NOT AUTHENTICATED: RENDER LOGIN / CREATE ACCOUNT SCREEN
   if (!isAuthenticated) {
     return <AuthModal onLoginSuccess={handleLoginSuccess} />;
   }
@@ -87,7 +118,9 @@ export default function App() {
 
         <div style={{ padding: '18px', background: 'var(--bg-beige-card)', borderRadius: '16px', border: '1px solid var(--border-subtle)' }}>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>👛 Wallet Balance</div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--primary-navy)' }}>₹ 1,250.00</div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--primary-navy)' }}>
+            ₹ {walletBalance.toFixed(2)}
+          </div>
           <button style={{ border: 'none', background: 'none', color: '#0c3259', fontWeight: 800, fontSize: '0.82rem', marginTop: '8px', cursor: 'pointer' }} onClick={() => setIsProfileOpen(true)}>
             Open Profile & Wallet ➔
           </button>

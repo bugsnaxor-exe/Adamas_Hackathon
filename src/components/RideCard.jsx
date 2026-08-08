@@ -8,34 +8,28 @@ import { StarIcon } from './Icons';
  */
 export default function RideCard({
   avatarUrl,
-  name = 'Raju Paul',
-  route = 'B16 - AIIMS',
-  price = 80,
+  name = 'Driver',
+  route = 'Pickup - Dropoff',
+  price = 0,
   rating = '4.9',
-  vehicle = 'Maruti WagonR',
+  vehicle = 'Standard Vehicle',
   buttonText = 'Book Now',
   onAction,
-  showContact = false,
+  showContact = false, // You can use this flag later if you want to embed the contact bar inside the card
   onCall,
   onSms,
   tag = '',
   className = ''
 }) {
-  // Generate avatar initials or placeholder color
-  const initials = name ? name.split(' ').map(n => n[0]).join('').substring(0, 2) : 'RP';
+  
+  // If no avatar is provided by the backend, dynamically generate a beautiful initial-based avatar
+  const displayAvatarUrl = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=e2e8f0&color=0c3259&bold=true`;
 
   return (
     <div className={`custom-ride-card ${className}`}>
       {/* 1. Left Thumbnail Box */}
       <div className="ride-card-avatar-box">
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={name} className="avatar-img" />
-        ) : (
-          <div className="avatar-placeholder-inner">
-            {/* Soft Gray Square Avatar with User/Car graphic */}
-            <span className="avatar-emoji">👤</span>
-          </div>
-        )}
+        <img src={displayAvatarUrl} alt={name} className="avatar-img" style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
       </div>
 
       {/* 2. Middle Content Stack */}

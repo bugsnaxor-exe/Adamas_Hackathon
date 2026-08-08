@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import axios from 'axios'; 
+
+const API_BASE_URL = 'http://localhost:5000/api/users'; 
 
 export default function AuthModal({ onLoginSuccess }) {
   const [mode, setMode] = useState('login'); // 'login' | 'register'
@@ -18,18 +21,54 @@ export default function AuthModal({ onLoginSuccess }) {
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
 
-  const handleLogin = (e) => {
+  // Async Login Handler
+  const handleLogin = async (e) => {
     e.preventDefault();
-    onLoginSuccess(loginEmail.split('@')[0] || 'Alex');
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login/email`, {
+        email: loginEmail,
+        password: loginPassword
+      });
+
+      // Securely store the JWT and user data for future API requests
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data));
+
+      // Pass the user's name back to the parent component
+      onLoginSuccess(response.data.name);
+    } catch (error) {
+      // Capture error message from the backend or fallback to generic message
+      const errorMsg = error.response?.data?.message || 'Login failed. Please check your credentials.';
+      alert(errorMsg);
+    }
   };
 
-  const handleRegister = (e) => {
+  // Async Register Handler
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (regPassword !== regConfirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    onLoginSuccess(regName || 'Alex');
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/register`, {
+        name: regName,
+        email: regEmail,
+        phone: regPhone,
+        password: regPassword
+      });
+
+      // Securely store the JWT and user data for future API requests
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data));
+
+      // Pass the user's name back to the parent component
+      onLoginSuccess(response.data.name);
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || 'Registration failed. Please try again.';
+      alert(errorMsg);
+    }
   };
 
   return (

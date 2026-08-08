@@ -1,45 +1,112 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import RideCard from './RideCard';
 import ContactRiderBar from './ContactRiderBar';
 import { OfferRideIcon, LocationIcon, CalendarIcon, UserIcon, CheckIcon } from './Icons';
 
+const API_BASE_URL = 'http://localhost:5000/api';
+
 export default function OfferRide() {
   const [isMapExpanded, setIsMapExpanded] = useState(false);
   const [isListed, setIsListed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // User & Vehicle State from Backend
+  const [user, setUser] = useState(null);
+  const [vehicleId, setVehicleId] = useState(null);
 
   // Form Fields
   const [whereTo, setWhereTo] = useState('B16 - AIIMS');
-  const [offerDate, setOfferDate] = useState('2026-08-09');
+  // Use today's date as default
+  const [offerDate, setOfferDate] = useState(new Date().toISOString().split('T')[0]);
   const [offerSeats, setOfferSeats] = useState(3);
   const [seatPrice, setSeatPrice] = useState('80');
 
   // Auto-Fetched Vehicle Registration Data State
   const [vehRegNo, setVehRegNo] = useState('WB02AB1234');
-  const [ownerDetails, setOwnerDetails] = useState('Alex Rivera (Emp ID: EMP-9042)');
-  const [vehicleName, setVehicleName] = useState('Tesla Model 3 • White');
+  const [ownerDetails, setOwnerDetails] = useState('Loading...');
+  const [vehicleName, setVehicleName] = useState('Loading...');
   const [licenseNo, setLicenseNo] = useState('DL-90481239084');
 
-  // Popups State
+  // Popups State (For Demo Flow)
   const [showCommuterPopup, setShowCommuterPopup] = useState(false);
   const [showPaymentReceivedPopup, setShowPaymentReceivedPopup] = useState(false);
 
-  // Auto-fetch simulation on Vehicle Reg No change
-  const handleRegNoChange = (val) => {
-    setVehRegNo(val);
-    if (val.length >= 6) {
-      setOwnerDetails('Alex Rivera (Emp ID: EMP-9042)');
-      setVehicleName('Tesla Model 3 • White');
-      setLicenseNo('DL-90481239084');
-    }
-  };
+  // Fetch the user's registered vehicle from the backend when the page loads
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userStr = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      
+      if (userStr && token) {
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+        setOwnerDetails(`${userData.name}`);
 
-  const handleListNow = (e) => {
+        try {
+          // Fetch driver's vehicles
+          const res = await axios.get(`${API_BASE_URL}/vehicles/user/${userData._id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (res.data.vehicles && res.data.vehicles.length > 0) {
+            const myVehicle = res.data.vehicles[0]; // Use their first registered vehicle
+            setVehicleId(myVehicle._id);
+            setVehRegNo(myVehicle.registrationNumber);
+            setVehicleName(`${myVehicle.vehicleModel}`);
+          } else {
+            setVehicleName('No vehicle found. Please register one.');
+          }
+        } catch (error) {
+          console.error("Error fetching vehicle:", error);
+        }
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  // Post the ride to the backend
+  const handleListNow = async (e) => {
     e.preventDefault();
-    setIsListed(true);
-    // Simulate commuter popup appearing
-    setTimeout(() => {
-      setShowCommuterPopup(true);
-    }, 1500);
+    
+    if (!user || !vehicleId) {
+      alert("You need to be logged in and have a registered vehicle to offer a ride.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Sending data to your ride.controller.js
+      await axios.post(`${API_BASE_URL}/rides`, {
+        driverId: user._id,
+        vehicleId: vehicleId,
+        pickupCoords: [77.2090, 28.6139], // Mock coordinates for HQ
+        pickupAddress: 'Company HQ - Main Gate',
+        destCoords: [77.2500, 28.6500], // Mock coordinates for destination
+        destAddress: whereTo,
+        travelDateTime: offerDate, 
+        totalSeats: offerSeats,
+        farePerSeat: Number(seatPrice)
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setIsListed(true);
+      
+      // Simulate commuter popup appearing (Great for hackathon pitch!)
+      // In a real app, this would be triggered by a Socket.io event.
+      setTimeout(() => {
+        setShowCommuterPopup(true);
+      }, 3500);
+
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error publishing ride.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAcceptCommuter = () => {
@@ -47,7 +114,7 @@ export default function OfferRide() {
     // Simulate payment received popup
     setTimeout(() => {
       setShowPaymentReceivedPopup(true);
-    }, 1200);
+    }, 1500);
   };
 
   return (
@@ -116,25 +183,20 @@ export default function OfferRide() {
                 <input type="number" value={seatPrice} onChange={(e) => setSeatPrice(e.target.value)} placeholder="Set price for one seat..." required />
               </div>
 
-              <div className="input-pill-field">
-                <span>🚘 Vehicle Reg No:</span>
-                <input type="text" value={vehRegNo} onChange={(e) => handleRegNoChange(e.target.value)} placeholder="Enter Reg No..." required />
-              </div>
-
-              {/* AUTO-FETCHED VEHICLE & OWNER DETAILS */}
+              {/* READ-ONLY AUTO-FETCHED VEHICLE DETAILS */}
               <div className="beige-card" style={{ padding: '14px 18px', margin: '10px 0 16px 0', background: '#fdfcf7' }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#10b981', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <CheckIcon size={14} color="#10b981" />
-                  <span>AUTOMATICALLY FETCHED VEHICLE DETAILS</span>
+                  <span>YOUR REGISTERED VEHICLE</span>
                 </div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800 }}>🚘 {vehicleName}</div>
-                <div style={{ fontSize: '0.82rem', color: '#475569' }}>👤 Owner: {ownerDetails}</div>
-                <div style={{ fontSize: '0.82rem', color: '#475569' }}>📄 License: {licenseNo}</div>
+                <div style={{ fontSize: '0.82rem', color: '#475569' }}>📍 Reg No: {vehRegNo}</div>
+                <div style={{ fontSize: '0.82rem', color: '#475569' }}>👤 Driver: {ownerDetails}</div>
               </div>
 
-              <button type="submit" className="btn-navy-primary" style={{ width: '100%', padding: '16px', borderRadius: '28px' }}>
+              <button type="submit" disabled={isLoading} className="btn-navy-primary" style={{ width: '100%', padding: '16px', borderRadius: '28px', opacity: isLoading ? 0.7 : 1 }}>
                 <OfferRideIcon size={20} color="#fff" />
-                <span>List Ride Now</span>
+                <span>{isLoading ? 'Publishing...' : 'List Ride Now'}</span>
               </button>
             </form>
           ) : (
@@ -146,19 +208,19 @@ export default function OfferRide() {
 
               {/* Image 1 Card Shape for Active Offered Ride */}
               <RideCard 
-                name="Alex (You)"
+                name={`${user?.name} (You)`}
                 route={whereTo}
                 price={seatPrice}
                 rating="5.0"
                 vehicle={vehicleName}
                 buttonText="Live Listing"
-                tag="3 Seats Available"
-                onAction={() => alert('Your offered ride is active!')}
+                tag={`${offerSeats} Seats Available`}
+                onAction={() => alert('Your offered ride is active and visible to others!')}
               />
             </div>
           )}
 
-          {/* LIVE POPUP 1: A COMMUTER NEARBY (Includes Image 3 Call & SMS Bar) */}
+          {/* LIVE POPUP 1: A COMMUTER NEARBY (Simulated for Demo) */}
           {showCommuterPopup && (
             <div className="live-commuter-popup">
               <h4 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0c3259', marginBottom: '4px' }}>🙋‍♂️ Commuter Requested Ride</h4>
@@ -180,7 +242,7 @@ export default function OfferRide() {
             </div>
           )}
 
-          {/* LIVE POPUP 2: MONEY RECEIVED */}
+          {/* LIVE POPUP 2: MONEY RECEIVED (Simulated for Demo) */}
           {showPaymentReceivedPopup && (
             <div className="live-commuter-popup" style={{ borderColor: '#10b981', background: '#f0fdf4' }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#10b981', marginBottom: '6px' }}>💰 Money Received ₹ {seatPrice}.00</h4>

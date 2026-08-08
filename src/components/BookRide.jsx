@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import RideCard from './RideCard';
 import ContactRiderBar from './ContactRiderBar';
 import { LocationIcon, CalendarIcon, UserIcon, WalletIcon, BookRideIcon } from './Icons';
+
+const API_BASE_URL = 'http://localhost:5000/api';
 
 export default function BookRide() {
   // Map Expand / Rapido Sheet Toggle
@@ -14,51 +17,86 @@ export default function BookRide() {
   const [whereTo, setWhereTo] = useState('AIIMS Hospital');
   const [selectDate, setSelectDate] = useState('2026-08-09');
   const [selectSeats, setSelectSeats] = useState(1);
+  
   const [selectedRider, setSelectedRider] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('upi'); // 'upi' | 'card' | 'wallet' | 'cash'
+  
+  // Backend Data States
+  const [availableRides, setAvailableRides] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock Available Riders List (Using Image 1 details like Raju Paul, B16 - AIIMS, ₹ 80/seat)
-  const mockRiders = [
-    { 
-      id: 1, 
-      name: 'Raju Paul', 
-      rating: '4.9', 
-      vehicle: 'Maruti WagonR', 
-      route: 'B16 - AIIMS', 
-      price: 80, 
-      eta: '2 mins',
-      phone: '+91 98310 12345'
-    },
-    { 
-      id: 2, 
-      name: 'Amit Roy', 
-      rating: '4.8', 
-      vehicle: 'Hyundai i10', 
-      route: 'B16 - AIIMS', 
-      price: 75, 
-      eta: '4 mins',
-      phone: '+91 98311 67890'
-    },
-    { 
-      id: 3, 
-      name: 'Priya Sharma', 
-      rating: '5.0', 
-      vehicle: 'Honda City', 
-      route: 'Sector V - AIIMS', 
-      price: 90, 
-      eta: '6 mins',
-      phone: '+91 98312 34567'
+  // Endpoint Handler: Search Rides
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      // Note: In a real app, you would use Google Maps API to turn `whereTo` into lng/lat.
+      // For this hackathon, we pass dummy coordinates to trigger the $near search.
+      const lng = 77.2090; 
+      const lat = 28.6139;
+
+      const response = await axios.get(`${API_BASE_URL}/rides/search`, {
+        params: { lng, lat, date: selectDate, radiusInKm: 10 },
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Map backend data to match frontend component props
+      const mappedRides = response.data.rides.map(ride => ({
+        id: ride._id, // MongoDB ID
+        name: ride.driverId?.name || 'Driver',
+        phone: ride.driverId?.phone || 'N/A',
+        vehicle: ride.vehicleId?.vehicleModel || 'Standard Vehicle',
+        route: `${ride.pickupLocation?.address || 'Pickup'} - ${ride.destination?.address || 'Drop'}`,
+        price: ride.farePerSeat,
+        rating: '4.8', // Mock rating
+        eta: '5 mins', // Mock ETA 
+      }));
+
+      setAvailableRides(mappedRides);
+      setFlowStep('riders_list');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error searching for rides.');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   const handleSelectRider = (rider) => {
     setSelectedRider(rider);
     setFlowStep('active_eta');
   };
 
-  const handlePaySuccess = () => {
-    alert(`🎉 Payment of ₹ ${selectedRider ? selectedRider.price : 80} Successful via ${paymentMethod.toUpperCase()}! Your seat is confirmed.`);
-    setFlowStep('active_eta');
+  // Endpoint Handler: Book Trip & Pay
+  const handlePaySuccess = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      if (!user) {
+        alert("Please login first!");
+        return;
+      }
+
+      // Format payment string to match backend Enum
+      const backendPaymentMethod = paymentMethod === 'upi' ? 'UPI' : 
+                                   paymentMethod === 'card' ? 'Card' : 
+                                   paymentMethod === 'wallet' ? 'Wallet' : 'Cash';
+
+      await axios.post(`${API_BASE_URL}/trips/book`, {
+        rideId: selectedRider.id,
+        passengerId: user._id,
+        paymentMethod: backendPaymentMethod
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      alert(`🎉 Payment of ₹ ${selectedRider.price} Successful via ${paymentMethod.toUpperCase()}! Your seat is confirmed.`);
+      setFlowStep('active_eta');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error processing booking. Please try again.');
+    }
   };
 
   return (
@@ -102,7 +140,7 @@ export default function BookRide() {
 
           {/* STEP A: SEARCH FORM */}
           {flowStep === 'search' && (
-            <form onSubmit={(e) => { e.preventDefault(); setFlowStep('riders_list'); }}>
+            <form onSubmit={handleSearchSubmit}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                 <BookRideIcon size={20} color="#0c3259" />
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0c3259' }}>Where are you travelling?</h3>
@@ -131,14 +169,14 @@ export default function BookRide() {
                 </div>
               </div>
 
-              <button type="submit" className="btn-navy-primary" style={{ width: '100%', padding: '16px', borderRadius: '28px', marginTop: '8px' }}>
+              <button type="submit" disabled={isLoading} className="btn-navy-primary" style={{ width: '100%', padding: '16px', borderRadius: '28px', marginTop: '8px', opacity: isLoading ? 0.7 : 1 }}>
                 <BookRideIcon size={18} color="#fff" />
-                <span>Find Available Rides</span>
+                <span>{isLoading ? 'Searching...' : 'Find Available Rides'}</span>
               </button>
             </form>
           )}
 
-          {/* STEP B: LIST OF RIDERS AVAILABLE (Image 1 Card Layout) */}
+          {/* STEP B: LIST OF RIDERS AVAILABLE */}
           {flowStep === 'riders_list' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
@@ -148,30 +186,33 @@ export default function BookRide() {
                 </button>
               </div>
 
-              {/* Renders RideCard matching Image 1 layout exactly */}
-              {mockRiders.map(rider => (
-                <RideCard
-                  key={rider.id}
-                  name={rider.name}
-                  route={rider.route}
-                  price={rider.price}
-                  rating={rider.rating}
-                  vehicle={rider.vehicle}
-                  buttonText="Book Now"
-                  onAction={() => handleSelectRider(rider)}
-                />
-              ))}
+              {availableRides.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#475569' }}>
+                  No active rides found for this date.
+                </div>
+              ) : (
+                availableRides.map(rider => (
+                  <RideCard
+                    key={rider.id}
+                    name={rider.name}
+                    route={rider.route}
+                    price={rider.price}
+                    rating={rider.rating}
+                    vehicle={rider.vehicle}
+                    buttonText="Book Now"
+                    onAction={() => handleSelectRider(rider)}
+                  />
+                ))
+              )}
             </div>
           )}
 
-          {/* STEP C: ACTIVE RIDE ETA & IMAGE 3 CALL/SMS PILL BAR */}
+          {/* STEP C: ACTIVE RIDE ETA & CONTACT INFO */}
           {(flowStep === 'active_eta' || flowStep === 'payment_page') && selectedRider && (
             <div>
-              {/* ETA Bar & Image 3 Contact Pill Control */}
               <div className="eta-communication-bar">
                 <div className="eta-title-text">⏰ Arriving in {selectedRider.eta}</div>
                 
-                {/* Image 3 Split Pill Bar Component */}
                 <div style={{ marginTop: '12px', marginBottom: '4px' }}>
                   <ContactRiderBar 
                     riderName={selectedRider.name}
@@ -182,7 +223,6 @@ export default function BookRide() {
                 </div>
               </div>
 
-              {/* Ride Details Card matching Image 1 shape */}
               <div style={{ marginTop: '14px' }}>
                 <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#475569', marginBottom: '6px' }}>CONFIRMED RIDE CARD</div>
                 <RideCard 
@@ -196,7 +236,6 @@ export default function BookRide() {
                 />
               </div>
 
-              {/* Detailed Breakdown Card */}
               <div className="beige-card" style={{ marginTop: '12px', background: '#fdfcf7' }}>
                 <div style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 800 }}>RIDE DIRECTION & VEHICLE</div>
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0c3259', margin: '4px 0' }}>{selectedRider.route}</div>
