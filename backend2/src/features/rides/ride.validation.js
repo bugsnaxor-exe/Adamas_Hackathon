@@ -4,12 +4,12 @@ const createRideSchema = Joi.object({
     vehicleId: Joi.string().hex().length(24).required().messages({
         "string.length": "Invalid Vehicle ID format",
     }),
-    pickup: Joi.object({
+    pickupCoords: Joi.object({
         lat: Joi.number().min(-90).max(90).required(),
         lng: Joi.number().min(-180).max(180).required(),
         address: Joi.string().required(),
     }).required(),
-    destination: Joi.object({
+    destCoords: Joi.object({
         lat: Joi.number().min(-90).max(90).required(),
         lng: Joi.number().min(-180).max(180).required(),
         address: Joi.string().required(),

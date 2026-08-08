@@ -33,36 +33,51 @@ const loginWithEmailSchema = Joi.object({
     }),
 });
 
-const requestOtpSchema = Joi.object({
-    phone: Joi.string()
-        .trim()
-        .pattern(/^[0-9]{10}$/)
-        .required()
-        .messages({
-            "string.pattern.base": "Phone number must be exactly 10 digits",
-            "any.required": "Phone number is required",
-        }),
-});
+// const requestOtpSchema = Joi.object({
+//     phone: Joi.string()
+//         .trim()
+//         .pattern(/^[0-9]{10}$/)
+//         .required()
+//         .messages({
+//             "string.pattern.base": "Phone number must be exactly 10 digits",
+//             "any.required": "Phone number is required",
+//         }),
+// });
 
-const loginWithPhoneSchema = Joi.object({
-    phone: Joi.string()
-        .trim()
-        .pattern(/^[0-9]{10}$/)
-        .required()
-        .messages({
-            "string.pattern.base": "Phone number must be exactly 10 digits",
-            "any.required": "Phone number is required",
-        }),
-    otp: Joi.string().trim().length(6).required().messages({
-        "string.length": "OTP must be exactly 6 digits",
-        "any.required": "OTP is required",
-    }),
-});
+// const loginWithPhoneSchema = Joi.object({
+//     phone: Joi.string()
+//         .trim()
+//         .pattern(/^[0-9]{10}$/)
+//         .required()
+//         .messages({
+//             "string.pattern.base": "Phone number must be exactly 10 digits",
+//             "any.required": "Phone number is required",
+//         }),
+//     otp: Joi.string().trim().length(6).required().messages({
+//         "string.length": "OTP must be exactly 6 digits",
+//         "any.required": "OTP is required",
+//     }),
+// });
 
 const forgotPasswordSchema = Joi.object({
     email: Joi.string().trim().email().required().messages({
         "string.email": "Please provide a valid email address",
         "any.required": "Email is required",
+    }),
+});
+
+const resetPasswordSchema = Joi.object({
+    email: Joi.string().trim().email().required().messages({
+        "string.email": "Please provide a valid email address",
+        "any.required": "Email is required",
+    }),
+    newPassword: Joi.string().min(6).required().messages({
+        "string.min": "New password must be at least 6 characters long",
+        "any.required": "New password is required",
+    }),
+    otp: Joi.string().trim().length(6).required().messages({
+        "string.length": "OTP must be exactly 6 digits",
+        "any.required": "OTP is required",
     }),
 });
 
@@ -82,8 +97,9 @@ const updateProfileSchema = Joi.object({
 module.exports = {
     registerValidationSchema,
     loginWithEmailSchema,
-    requestOtpSchema,
-    loginWithPhoneSchema,
+    // requestOtpSchema,
+    // loginWithPhoneSchema,
     forgotPasswordSchema,
+    resetPasswordSchema,
     updateProfileSchema,
 };

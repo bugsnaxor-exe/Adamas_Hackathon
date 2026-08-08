@@ -17,7 +17,7 @@ const {
 } = require("./ride.validation");
 
 // POST: /api/rides (Publish a new ride)
-router.post("/", protect, validateRequest(createRideSchema), createRide);
+router.post("/new", validateRequest(createRideSchema), createRide);
 
 // GET: /const Joi = require('joi');
 // api/rides/search?lng=77.2&lat=28.6&date=2023-12-01 (Find rides)

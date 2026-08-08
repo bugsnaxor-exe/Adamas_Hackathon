@@ -3,13 +3,11 @@ const catchAsync = require("../../middlewares/errorHandler");
 
 // 1. PUBLISH A RIDE (Driver)
 exports.createRide = catchAsync(async (req, res) => {
+    const driverId = req.user.id;
     const {
-        driverId,
         vehicleId,
         pickupCoords,
-        pickupAddress,
         destCoords,
-        destAddress,
         travelDateTime,
         totalSeats,
         farePerSeat,
@@ -20,13 +18,13 @@ exports.createRide = catchAsync(async (req, res) => {
         vehicleId,
         pickupLocation: {
             type: "Point",
-            coordinates: pickupCoords, // e.g., [77.2090, 28.6139]
-            address: pickupAddress,
+            coordinates: [pickupCoords.lng, pickupCoords.lat], // e.g., [77.2090, 28.6139]
+            address: pickupCoords.address,
         },
         destination: {
             type: "Point",
-            coordinates: destCoords,
-            address: destAddress,
+            coordinates: [destCoords.lng, destCoords.lat],
+            address: destCoords.address,
         },
         travelDateTime,
         totalSeats,

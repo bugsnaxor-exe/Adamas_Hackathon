@@ -7,7 +7,7 @@ app.use(express.json());
 // Import the user routes
 const userRoutes = require("./features/users/user.routes");
 const tripRoutes = require("./features/trips/trip.routes");
-const rideRoutes = require("./features/rides//ride.routes");
+const rideRoutes = require("./features/rides/ride.routes");
 const vehicleRoutes = require("./features/vehicles/vehicle.routes");
 const walletRoutes = require("./features/wallet/wallet.routes");
 

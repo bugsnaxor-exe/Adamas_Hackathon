@@ -5,9 +5,10 @@ const { protect } = require("../../middlewares/auth");
 const {
     registerUser,
     loginWithEmail,
-    requestOtp,
-    loginWithPhone,
+    // requestOtp,
+    // loginWithPhone,
     forgotPassword,
+    resetPassword,
     updateProfile,
 } = require("./user.controller");
 
@@ -15,41 +16,42 @@ const { validateRequest } = require("../../middlewares/validateRequest");
 const {
     registerValidationSchema,
     loginWithEmailSchema,
-    requestOtpSchema,
-    loginWithPhoneSchema,
+    // requestOtpSchema,
+    // loginWithPhoneSchema,
     forgotPasswordSchema,
+    resetPasswordSchema,
     updateProfileSchema,
 } = require("./user.validation");
 
 router.post(
     "/register",
-    protect,
     validateRequest(registerValidationSchema),
     registerUser,
 );
 router.post(
     "/login/email",
-    protect,
     validateRequest(loginWithEmailSchema),
     loginWithEmail,
 );
-router.post(
-    "/login/phone/request-otp",
-    protect,
-    validateRequest(requestOtpSchema),
-    requestOtp,
-);
-router.post(
-    "/login/phone/verify",
-    protect,
-    validateRequest(loginWithPhoneSchema),
-    loginWithPhone,
-);
+// router.post(
+//     "/login/phone/request-otp",
+//     validateRequest(requestOtpSchema),
+//     requestOtp,
+// );
+// router.post(
+//     "/login/phone/verify",
+//     validateRequest(loginWithPhoneSchema),
+//     loginWithPhone,
+// );
 router.post(
     "/login/forgot-password",
-    protect,
     validateRequest(forgotPasswordSchema),
     forgotPassword,
+);
+router.post(
+    "/login/reset-password",
+    validateRequest(resetPasswordSchema),
+    resetPassword,
 );
 router.put(
     "/profile",
