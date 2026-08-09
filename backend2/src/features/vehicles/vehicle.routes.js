@@ -26,12 +26,7 @@ const {
 router.post("/", protect, validateRequest(createVehicleSchema), addVehicle);
 
 // GET /api/vehicles/user -> Get all vehicles owned by a user
-router.get(
-    "/user",
-    protect,
-    validateParams(userIdParamSchema),
-    getUserVehicles,
-);
+router.get("/user", protect, getUserVehicles);
 
 // PUT /api/vehicles/:id -> Update a specific vehicle
 router.put("/:id", protect, validateParams(idParamSchema), updateVehicle);

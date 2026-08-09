@@ -1,0 +1,7 @@
+/* Custom application styles that fall outside of standard Tailwind utilities */
+@import "tailwindcss";
+
+.custom-car-marker {
+    background: transparent;
+    border: none;
+}

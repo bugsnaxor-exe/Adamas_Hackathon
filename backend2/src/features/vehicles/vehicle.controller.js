@@ -1,11 +1,11 @@
 const Vehicle = require("./vehicle.model"); // Adjust path if needed
-const paginate = require("../../utils/paginationHelper"); // Adjust path if needed
 const catchAsync = require("../../middlewares/errorHandler");
+const paginate = require("../../utils/paginationHelper");
 
 // 1. ADD A NEW VEHICLE
 exports.addVehicle = catchAsync(async (req, res) => {
-    const { ownerId, vehicleModel, registrationNumber, seatingCapacity } =
-        req.body;
+    const ownerId = req.user.id;
+    const { vehicleModel, registrationNumber, seatingCapacity } = req.body;
 
     // Optional: Check if a vehicle with this registration number already exists
     const existingVehicle = await Vehicle.findOne({ registrationNumber });
@@ -31,12 +31,18 @@ exports.addVehicle = catchAsync(async (req, res) => {
 // 2. GET ALL VEHICLES FOR A SPECIFIC USER
 // (Drivers need this to select which car they are using before publishing a ride)
 exports.getUserVehicles = catchAsync(async (req, res) => {
-    const { userId } = req.user.id;
+    const userId = req.user.id;
     const { pageNo, limit } = req.query;
 
-    const results = await paginate(Vehicle, pageNo, limit, {
-        ownerId: userId,
-    });
+    const results = await paginate(
+        Vehicle,
+        pageNo,
+        limit,
+        {
+            ownerId: userId,
+        },
+        "",
+    );
 
     res.status(200).json(results);
 });

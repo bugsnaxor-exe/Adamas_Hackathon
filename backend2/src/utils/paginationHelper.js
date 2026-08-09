@@ -30,3 +30,5 @@ const paginate = async (
         data: data,
     };
 };
+
+module.exports = paginate;

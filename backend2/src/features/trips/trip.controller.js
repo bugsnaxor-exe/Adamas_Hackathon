@@ -1,7 +1,7 @@
 const Trip = require("./trip.model");
 const Ride = require("../rides/ride.model");
 const catchAsync = require("../../middlewares/errorHandler");
-
+const paginate = require("../../utils/paginationHelper");
 // 1. BOOK A TRIP
 exports.bookTrip = catchAsync(async (req, res) => {
     const { rideId, paymentMethod } = req.body;
